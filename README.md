@@ -16,7 +16,7 @@
 2. Buat repository GitHub baru untuk pengujian paket gabungan, misalnya `cangkangmas-gabungan-uji`. Upload **isi folder paket ini** ke root repo (bukan folder pembungkusnya). Jangan gunakan repository aplikasi aktif lebih dahulu.
 3. GitHub → Settings → Pages → Deploy from a branch → `main` → `/(root)` → Save. Alamat uji akan berbentuk `https://NAMA-AKUN.github.io/cangkangmas-gabungan-uji/`.
 4. Firebase Authentication → Settings → Authorized domains: tambahkan `NAMA-AKUN.github.io` bila belum ada. Pastikan email/password pengguna manajemen masih aktif.
-5. Firebase Firestore → Rules: **tinjau dan terapkan isi `firestore.rules` gabungan**. Rules ini mempertahankan pembatasan UID dari ZIP sumber dan menambahkan akses baca publik hanya ke `publicSite/config`, `publicSite/products/*`, `publicSite/gallery/*`. Jangan gunakan `allow read, write: if true`. Jika UID akun pemilik berubah, sesuaikan rules dengan UID terbaru **sebelum** digunakan, tanpa melonggarkan perlindungan.
+5. Firebase Firestore → Rules: **tinjau dan terapkan isi `firestore.rules` gabungan**. Rules ini mempertahankan pembatasan UID dari ZIP sumber dan menambahkan akses baca publik hanya ke `publicSite/config`, `publicSite/products/items/*`, `publicSite/gallery/items/*`. Jangan gunakan `allow read, write: if true`. Jika UID akun pemilik berubah, sesuaikan rules dengan UID terbaru **sebelum** digunakan, tanpa melonggarkan perlindungan.
 6. Buka URL uji → Login → aplikasi manajemen → Lainnya → Website Publik. Pada Produk & Harga, tekan **Buat Produk Awal HORN & OMEGA** bila belum ada, lalu isi harga publik dan foto. Atur kontak WhatsApp dengan tepat satu nomor utama yang aktif; lengkapi profil, SEO, galeri, dan Beranda. Data pemasaran publik terpisah dari transaksi, stok, harga kulak, bon, tray, FIFO, dan laporan.
 7. Uji login, siklus baca/tulis Firestore, menu admin, foto, WhatsApp, harga produk, nota, dan manajemen transaksi di lingkungan yang cocok dengan database Anda. **Jangan memindahkan ke repo aplikasi aktif sebelum pemeriksaan tersebut selesai.**
 
@@ -39,3 +39,10 @@ Teks SEO dapat diubah via Login → Manajemen Telur → Lainnya → Website Publ
 - Tombol Login publik menuju `/manajemen/`, sehingga pengunjung tidak mendapat akses tanpa akun Firebase yang diizinkan rules.
 - SEO Google Search Console dan Profil Bisnis Google tidak didaftarkan/diedit oleh ZIP ini; perlu akses akun Google dan domain aktif.
 - Paket diuji secara statis dan unit test engine lokal; **belum teruji login langsung dengan akun Firebase, upload repo, browser HP/laptop, atau cetak fisik**.
+
+
+## Hotfix jalur Firestore (2026-09-25)
+
+Perbaikan error `Invalid collection reference ... publicSite/products has 2` dengan menggunakan koleksi valid `publicSite/products/items` dan `publicSite/gallery/items` untuk **seluruh operasi baca/tulis/hapus** di halaman publik dan pengelola. Dokumen `publicSite/config` tetap sama. Terapkan rules pada `firestore.rules` setelah membandingkannya dengan rules aktif. Jangan menghapus data manajemen.
+
+Saat mengunggah ke repository GitHub Pages, unggah **ISI ZIP ke root repository** (file `index.html` harus berada di root), bukan satu folder pembungkus. Pada repository GitHub Pages dengan alamat `username.github.io/nama-repo/`, navigasi/rute produk perlu diuji lagi sebelum dinyatakan final.

@@ -3,8 +3,7 @@ service cloud.firestore {
  match /databases/{database}/documents {
   function owner() {
    return request.auth != null
-    && request.auth.uid == 'ucIkAmsEPqYXXyZM4U9OV5Rq8Fa2'
-    && request.auth.token.firebase.sign_in_provider == 'password';
+    && request.auth.uid == 'ucIkAmsEPqYXXyZM4U9OV5Rq8Fa2';
   }
   match /users/{userId}/{document=**} {
    allow read, write: if owner() && userId == request.auth.uid;
@@ -13,11 +12,11 @@ service cloud.firestore {
    allow read: if true;
    allow write: if owner() && request.resource.data.size() <= 100;
   }
-  match /publicSite/products/{id} {
+  match /publicSite/products/items/{id} {
    allow read: if true;
    allow write: if owner();
   }
-  match /publicSite/gallery/{id} {
+  match /publicSite/gallery/items/{id} {
    allow read: if true;
    allow write: if owner();
   }
