@@ -3,7 +3,7 @@ export const defaults = {
  nav:['Beranda','Produk','Galeri','Profil','Kontak'], loginLabel:'Login',
  heroEyebrow:'SELAMAT DATANG DI CANGKANG MAS', heroTitle:'Telur Fresh, Siap Angkut!',
  heroText:'Pilihan telur segar untuk kebutuhan rumah tangga, toko, dan usaha kuliner. Melayani pembelian eceran dan grosir.',
- heroImage:'', logoImage:'', profileImage:'',
+ heroImage:'', logoImage:'', profileImage:'', showHeaderSlogan:false,
  homeProductTitle:'Pilihan Telur Cangkang Mas',homeProductIntro:'Kenali pilihan telur kami dan lihat informasi lengkap pada halaman Produk.',
  productTitle:'Produk & Harga Telur', productIntro:'Informasi harga eceran dan grosir per kilogram.',
  productNote:'Harga dapat berubah mengikuti kondisi pasar. Hubungi kami untuk informasi lebih lanjut.',
