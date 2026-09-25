@@ -1,0 +1,3 @@
+User-agent: *
+Disallow: /manajemen/
+Sitemap: https://cangkangmas.id/sitemap.xml
