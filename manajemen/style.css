@@ -83,3 +83,9 @@
  .history-actions{justify-content:flex-end;flex-wrap:wrap}
  .history-actions .outline{min-width:58px;padding:7px 8px;font-size:12px}
 }
+
+/* Revisi 4: nama jenis telur menjadi akses detail transaksi; tombol Detail dihapus. */
+.history-title{appearance:none;border:0;background:transparent;padding:0;margin:0;color:#0f4f9a;font:inherit;font-size:14px;font-weight:800;line-height:1.35;cursor:pointer;text-align:left;text-decoration:none}
+.history-title:hover{text-decoration:underline;color:#0b3f7d}
+.history-title:focus-visible{outline:2px solid #3278c8;outline-offset:3px;border-radius:3px}
+@media(max-width:690px){.history-title{font-size:13px}}
