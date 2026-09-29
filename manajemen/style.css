@@ -89,3 +89,9 @@
 .history-title:hover{text-decoration:underline;color:#0b3f7d}
 .history-title:focus-visible{outline:2px solid #3278c8;outline-offset:3px;border-radius:3px}
 @media(max-width:690px){.history-title{font-size:13px}}
+
+/* Revisi 6: nomor urut visual + catatan transaksi pada riwayat penjualan */
+.list-row{position:relative}
+.history-seq{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:30px;font-weight:800;letter-spacing:.04em;color:#174e8b;opacity:.14;line-height:1;pointer-events:none;user-select:none}
+.history-note{margin-top:7px!important;color:#5f728b!important;font-style:italic;max-width:520px;white-space:normal}
+@media(max-width:690px){.history-seq{font-size:24px;opacity:.12}.history-note{max-width:58vw}}
