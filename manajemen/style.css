@@ -98,3 +98,38 @@
 
 /* Revisi 1-3 Oct 2026: laporan lengkap, harga default, multi-item */
 .sale-items-wrap{grid-column:1/-1;display:block}.sale-items-label{display:block;font-size:12px;font-weight:800;color:#38516d;margin-bottom:8px}.sale-item{border:1px solid #d8e4f2;background:#f8fbff;border-radius:14px;padding:13px;margin-bottom:10px}.sale-item-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}.sale-item-head b{color:#174e8b}.sale-item-head .danger-btn{min-height:32px;padding:6px 10px;font-size:11px}.sale-item-summary{margin-top:9px;padding:9px 10px;background:#eef5ff;border-radius:9px;font-size:12px;color:#52708f}.product-report-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.product-report-card{border:1px solid #dce7f3;background:#f8fbff;border-radius:13px;padding:14px}.product-report-card h3{margin:0 0 10px;color:#174e8b}.product-report-card .row{padding:5px 0}.report-list-button{width:100%;border:0;border-bottom:1px solid #e8eef5;background:#fff;padding:12px 2px;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;color:#172b46}.report-list-button:hover{background:#f7faff}.report-list-button span{min-width:0}.report-list-button b{display:block;font-size:14px}.report-list-button small{display:block;color:#778ba3;margin-top:4px}.report-list-button strong{color:#174e8b;white-space:nowrap}.debt-payment-row{padding:8px 0;border-bottom:1px solid #edf1f6}@media(max-width:690px){.product-report-grid{grid-template-columns:1fr}.report-list-button{align-items:flex-start}.sale-item{padding:11px}}
+
+/* Revisi UI popup tablet & laptop: semua modal dibuat lebih lega tanpa mengubah tampilan HP. */
+@media (min-width:691px){
+  .modal{padding:24px;align-items:center}
+  .modal-card{
+    width:min(92vw,900px);
+    max-height:94dvh;
+    padding:26px 28px;
+    border-radius:20px;
+    box-shadow:0 24px 70px #061d3850;
+  }
+  .modal-head{margin-bottom:20px}
+  .modal-head h2{font-size:23px;line-height:1.25}
+  .icon-btn{width:40px;height:40px;border-radius:11px;font-size:18px}
+  .modal-card label{font-size:13px}
+  .modal-card input,.modal-card select,.modal-card textarea{padding:14px 15px;font-size:16px;border-radius:11px}
+  .modal-card textarea{min-height:92px}
+  .modal-card .form-grid{gap:16px 18px}
+  .modal-card .field{gap:7px}
+  .modal-card .hint,.modal-card .small,.modal-card .help{font-size:13px;line-height:1.55}
+  .modal-card .primary,.modal-card .secondary,.modal-card .danger-btn{min-height:47px;padding:13px 18px;font-size:15px}
+  .modal-card .outline{padding:10px 14px;font-size:14px}
+  .modal-card .summary{padding:17px;margin:17px 0}
+  .modal-card .summary strong{font-size:26px}
+  .modal-card .sale-item{padding:17px;margin-bottom:13px}
+  .modal-card .sale-item-summary{padding:11px 12px;font-size:13px}
+  .modal-card .detail-item{padding:14px 15px}
+  .modal-card .table{font-size:14px}
+  .modal-card .table td,.modal-card .table th{padding:13px}
+}
+@media (min-width:1200px){
+  .modal-card{width:min(86vw,1060px);padding:30px 32px}
+  .modal-head h2{font-size:24px}
+  .modal-card .form-grid{gap:18px 20px}
+}
