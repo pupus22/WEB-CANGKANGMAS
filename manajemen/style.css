@@ -133,3 +133,53 @@
   .modal-head h2{font-size:24px}
   .modal-card .form-grid{gap:18px 20px}
 }
+
+
+/* Revisi UI compact tablet & laptop: spacing dipadatkan, card item diperjelas. */
+@media (min-width:691px){
+  .modal-card{
+    padding:22px 24px;
+  }
+  .modal-head{margin-bottom:14px}
+  .modal-head h2{font-size:22px}
+  .icon-btn{width:36px;height:36px;border-radius:10px;font-size:17px}
+  .modal-card label{font-size:12.5px}
+  .modal-card input,.modal-card select,.modal-card textarea{
+    padding:11px 13px;
+    font-size:15px;
+    border-radius:10px;
+  }
+  .modal-card textarea{min-height:76px}
+  .modal-card .form-grid{gap:10px 14px}
+  .modal-card .field{gap:4px}
+  .modal-card .hint,.modal-card .small,.modal-card .help{font-size:12px;line-height:1.42}
+  .modal-card .form-actions{margin-top:12px}
+  .modal-card .primary,.modal-card .secondary,.modal-card .danger-btn{min-height:43px;padding:10px 15px;font-size:14px}
+  .modal-card .outline{padding:8px 12px;font-size:13px}
+  .modal-card .summary{padding:13px 14px;margin:12px 0}
+  .modal-card .summary strong{font-size:24px}
+  .modal-card .divider{margin:11px 0}
+  .modal-card .sale-items-label{margin-bottom:6px}
+  .modal-card .sale-item{
+    padding:13px 14px;
+    margin-bottom:9px;
+    background:#eaf2fb;
+    border:1px solid #bfd2e7;
+    box-shadow:inset 0 0 0 1px #ffffff66;
+  }
+  .modal-card .sale-item-head{margin-bottom:7px}
+  .modal-card .sale-item-summary{
+    margin-top:7px;
+    padding:8px 10px;
+    font-size:12px;
+    background:#dce9f7;
+    color:#466582;
+  }
+  .modal-card .detail-item{padding:11px 12px}
+  .modal-card .table td,.modal-card .table th{padding:10px 11px}
+}
+@media (min-width:1200px){
+  .modal-card{padding:24px 26px}
+  .modal-head h2{font-size:23px}
+  .modal-card .form-grid{gap:11px 15px}
+}
