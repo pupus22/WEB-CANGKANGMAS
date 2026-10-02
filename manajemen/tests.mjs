@@ -59,3 +59,29 @@ test('edit harga jual harian tidak mengubah jenis telur atau harga kulak',()=>{
  const corrected=replay(base.map(e=>e.id===sale.id?{...e,data:{...e.data,price:26000}}:e));assert.equal(corrected.invoices[sale.id].revenue,319000);assert.equal(corrected.products.horn.name,'HORN');assert.equal(corrected.outcomes[sale.id].cogs,285000);
 });
 console.log('TOTAL FINAL '+tests+' pengujian lulus');
+test('retur Pembeli umum dari nota tanpa customer diizinkan',()=>{
+ const stock=E('purchase','2026-09-23',{productId:'horn',weight:2000,price:22000});
+ const saleGeneral=E('sale',d,{productId:'horn',weight:1000,price:25000,paid:25000,channel:'offline'});
+ const ret=E('return',d,{direction:'customer',partyId:'',productId:'horn',invoiceId:saleGeneral.id,weight:100,resolution:'none'});
+ const r=replay([p,stock,saleGeneral,ret]);
+ assert.equal(r.stock.horn,1000);
+});
+test('refund Pembeli umum dapat diselesaikan tanpa membuat customer',()=>{
+ const stock=E('purchase','2026-09-23',{productId:'horn',weight:2000,price:22000});
+ const saleGeneral=E('sale',d,{productId:'horn',weight:1000,price:25000,paid:25000,channel:'offline'});
+ const ret=E('return',d,{direction:'customer',partyId:'',productId:'horn',invoiceId:saleGeneral.id,weight:100,resolution:'refund',refund:2500});
+ const refund=E('settlement',d,{partyId:'',claimId:ret.id,mode:'refund',amount:2500,pay:'cash'});
+ const r=replay([p,stock,saleGeneral,ret,refund]);
+ assert.equal(r.claims[ret.id].refundDue,0);
+ assert.equal(r.outcomes[refund.id].profit,0);
+});
+test('penggantian telur Pembeli umum dapat diselesaikan dan mengurangi stok',()=>{
+ const stock=E('purchase','2026-09-23',{productId:'horn',weight:2000,price:22000});
+ const saleGeneral=E('sale',d,{productId:'horn',weight:1000,price:25000,paid:25000,channel:'offline'});
+ const ret=E('return',d,{direction:'customer',partyId:'',productId:'horn',invoiceId:saleGeneral.id,weight:100,resolution:'replace'});
+ const rep=E('settlement',d,{partyId:'',productId:'horn',claimId:ret.id,mode:'egg',weight:100});
+ const r=replay([p,stock,saleGeneral,ret,rep]);
+ assert.equal(r.claims[ret.id].eggDue,0);
+ assert.equal(r.stock.horn,900);
+});
+console.log('TOTAL FINAL '+tests+' pengujian lulus');

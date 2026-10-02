@@ -96,42 +96,43 @@ export function replay(events){
    case 'return':{
     const p=egg(v.productId),weight=positive(v.weight,'Berat retur'),direction=v.direction,resolution=v.resolution;
     required(weight>0,'Berat retur harus lebih dari nol.');required(['customer','supplier','internal'].includes(direction),'Arah retur tidak valid.');required(['none','refund','replace'].includes(resolution),'Penyelesaian retur tidak valid.');
-    const c=v.partyId?owner(v.partyId):null;required(direction==='internal'||c?.kind===direction,'Pilih customer atau supplier yang sesuai retur.');
+    const c=v.partyId?owner(v.partyId):null,sourceInvoice=v.invoiceId?invoices[v.invoiceId]:null,anonymousCustomer=direction==='customer'&&sourceInvoice&&!sourceInvoice.partyId&&!v.partyId;
+    required(direction==='internal'||anonymousCustomer||c?.kind===direction,'Pilih customer atau supplier yang sesuai retur.');
     let channel=v.channel||'shared';
     if(v.invoiceId){
-      const i=invoices[v.invoiceId];required(direction==='customer'&&i&&!i.opening&&i.partyId===v.partyId,'Nota penjualan asal retur tidak sesuai customer.');const invItems=Array.isArray(i.items)&&i.items.length?i.items:[{productId:i.productId,weight:i.weight}];const invItem=invItems.find(x=>x.productId===v.productId);required(invItem,'Jenis telur tidak ada pada nota asal.');const returnKey=v.invoiceId+'|'+v.productId;returnedWeight[returnKey]=(returnedWeight[returnKey]||0)+weight;required(returnedWeight[returnKey]<=invItem.weight,'Total berat retur melebihi berat jenis telur pada nota asal.');channel=i.channel;
+      const i=sourceInvoice;required(direction==='customer'&&i&&!i.opening&&(i.partyId||'')===(v.partyId||''),'Nota penjualan asal retur tidak sesuai customer.');const invItems=Array.isArray(i.items)&&i.items.length?i.items:[{productId:i.productId,weight:i.weight}];const invItem=invItems.find(x=>x.productId===v.productId);required(invItem,'Jenis telur tidak ada pada nota asal.');const returnKey=v.invoiceId+'|'+v.productId;returnedWeight[returnKey]=(returnedWeight[returnKey]||0)+weight;required(returnedWeight[returnKey]<=invItem.weight,'Total berat retur melebihi berat jenis telur pada nota asal.');channel=i.channel;
     }
     let loss=0;if(direction!=='customer')loss=takeFIFO(p,weight,ref).cost;
     const refund=positive(v.refund||0,'Nilai refund');
-    if(c&&resolution==='refund'){required(refund>0,'Masukkan nilai penggantian uang.');c.refundDue+=refund;}
+    if(resolution==='refund'){required(refund>0,'Masukkan nilai penggantian uang.');if(c)c.refundDue+=refund;}
     if(c&&resolution==='replace')c.eggDue+=weight;
-    if(c&&resolution!=='none')claims[e.id]={id:e.id,partyId:c.id,productId:v.productId,channel,direction,resolution,weight,refundDue:resolution==='refund'?refund:0,eggDue:resolution==='replace'?weight:0};
+    if(resolution!=='none')claims[e.id]={id:e.id,partyId:c?.id||'',productId:v.productId,channel,direction,resolution,weight,refundDue:resolution==='refund'?refund:0,eggDue:resolution==='replace'?weight:0};
     // Retur customer: telur sudah berkurang saat penjualan; jangan dikurangi lagi.
     // Refund customer mengurangi laba ketika hak refund dicatat, bukan saat uang dibayar.
     const recognized=direction==='customer'&&resolution==='refund'?-refund:-loss;
     outcomes[e.id]={weight,recognized};add({...e,data:{...v,channel}},recognized,0,direction==='customer'?0:loss,direction==='customer'&&resolution==='refund'?refund:0);break;
    }
    case 'settlement':{
-    const c=owner(v.partyId),amount=positive(v.amount||0,'Pembayaran/penggantian'),mode=v.mode;
+    const amount=positive(v.amount||0,'Pembayaran/penggantian'),mode=v.mode,c=v.partyId?owner(v.partyId):null;
     if(mode==='debt'){
-      const i=invoices[v.invoiceId];required(i&&i.partyId===c.id,'Nota bon tidak ditemukan atau bukan milik customer ini.');required(amount>0&&i.debt>=amount,'Pembayaran melebihi sisa bon nota.');
+      required(c?.kind==='customer','Pilih customer untuk pembayaran bon.');const i=invoices[v.invoiceId];required(i&&i.partyId===c.id,'Nota bon tidak ditemukan atau bukan milik customer ini.');required(amount>0&&i.debt>=amount,'Pembayaran melebihi sisa bon nota.');
       i.debt-=amount;i.paid+=amount;c.debt-=amount;outcomes[e.id]={invoiceId:v.invoiceId,amount};cashPost(e,amount,v.pay||'cash');add(e,0);break;
     }
     const claim=claims[v.claimId];
-    required(claim&&claim.partyId===c.id,'Pilih retur yang belum diselesaikan milik customer/supplier ini.');
+    required(claim&&(claim.partyId||'')===(v.partyId||''),'Pilih retur yang belum diselesaikan milik customer/supplier ini.');
     required((mode==='refund'&&claim.resolution==='refund')||(mode==='egg'&&claim.resolution==='replace'),'Jenis penyelesaian tidak sesuai hak retur.');
     if(mode==='refund'){
       required(amount>0&&claim.refundDue>=amount,'Pengembalian uang melebihi sisa refund retur yang dipilih.');
-      claim.refundDue-=amount;c.refundDue-=amount;
-      // Refund supplier memulihkan rugi, refund customer sudah mengurangi laba pada tanggal retur.
-      const profit=c.kind==='supplier'?amount:0;cashPost(e,c.kind==='supplier'?amount:-amount,v.pay||'cash');add({...e,data:{...v,channel:claim.channel}},profit,0,0,-profit);break;
+      claim.refundDue-=amount;if(c)c.refundDue-=amount;
+      // Refund supplier memulihkan rugi; refund customer (termasuk Pembeli umum) sudah mengurangi laba pada tanggal retur.
+      const supplierRefund=claim.direction==='supplier',profit=supplierRefund?amount:0;cashPost(e,supplierRefund?amount:-amount,v.pay||'cash');add({...e,data:{...v,channel:claim.channel}},profit,0,0,-profit);break;
     }
     if(mode==='egg'){
       const qty=positive(v.weight||0,'Berat pengganti');
       required(qty>0&&claim.eggDue>=qty,'Penggantian telur melebihi sisa retur yang dipilih.');
       required(v.productId===claim.productId,'Jenis telur pengganti harus sama dengan jenis telur yang diretur.');
-      claim.eggDue-=qty;c.eggDue-=qty;
-      if(c.kind==='supplier'){const p=egg(v.productId);p.lots.push({source:e.id,qty,initialQty:qty,unit:0,totalCost:0});add(e,0);}
+      claim.eggDue-=qty;if(c)c.eggDue-=qty;
+      if(claim.direction==='supplier'){const p=egg(v.productId);p.lots.push({source:e.id,qty,initialQty:qty,unit:0,totalCost:0});add(e,0);}
       else {const cost=takeFIFO(egg(v.productId),qty,ref).cost;add({...e,data:{...v,channel:claim.channel}},-cost,0,cost);}
       break;
     }
