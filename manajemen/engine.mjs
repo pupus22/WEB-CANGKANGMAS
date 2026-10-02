@@ -35,13 +35,13 @@ export function replay(events){
   required(/^\d{4}-\d{2}-\d{2}$/.test(e.date||''),'Tanggal transaksi '+e.id+' tidak valid.');
   const v=e.data||{},ref=(e.label||e.type)+' ('+e.date+')';
   switch(e.type){
-   case 'product':required(v.name?.trim(),'Nama jenis telur wajib.');required(!products[e.id],'Jenis telur ganda.');products[e.id]={id:e.id,name:v.name.trim(),active:true,lots:[],lastPrice:0};break;
+   case 'product':required(v.name?.trim(),'Nama jenis telur wajib.');required(!products[e.id],'Jenis telur ganda.');products[e.id]={id:e.id,name:v.name.trim(),active:true,lots:[],lastPrice:0,lastCost:0,salePrice:positive(v.salePrice||0,'Harga jual default')};break;
    case 'contact':required(v.name?.trim()&&['customer','supplier'].includes(v.kind),'Data pihak tidak valid.');contacts[e.id]={id:e.id,name:v.name.trim(),kind:v.kind,phone:v.phone||'',address:v.address||'',debt:0,trayDue:0,eggDue:0,refundDue:0};break;
-   case 'productUpdate':required(products[v.target],'Jenis telur untuk koreksi tidak ditemukan.');required(v.name?.trim(),'Nama telur wajib.');Object.assign(products[v.target],{name:v.name.trim(),active:v.active!==false});break;
+   case 'productUpdate':required(products[v.target],'Jenis telur untuk koreksi tidak ditemukan.');required(v.name?.trim(),'Nama telur wajib.');Object.assign(products[v.target],{name:v.name.trim(),active:v.active!==false,...(v.salePrice!==undefined?{salePrice:positive(v.salePrice||0,'Harga jual default')}:{})});break;
    case 'contactUpdate':required(contacts[v.target],'Customer/supplier untuk koreksi tidak ditemukan.');required(v.name?.trim(),'Nama wajib.');Object.assign(contacts[v.target],{name:v.name.trim(),phone:v.phone||'',address:v.address||'',active:v.active!==false});break;
    case 'initial':{
     if(v.cashAmount!==undefined)cashPost(e,positive(v.cashAmount,'Kas awal'),v.pay||'cash');
-    if(v.productId){let p=egg(v.productId);if(v.weight){positive(v.weight,'Stok awal');p.lots.push({source:e.id,qty:v.weight,initialQty:v.weight,unit:positive(v.price||0,'Modal awal'),totalCost:Math.round(v.weight*(v.price||0)/1000)});}}
+    if(v.productId){let p=egg(v.productId);if(v.weight){positive(v.weight,'Stok awal');const initialUnit=positive(v.price||0,'Modal awal');p.lots.push({source:e.id,qty:v.weight,initialQty:v.weight,unit:initialUnit,totalCost:Math.round(v.weight*initialUnit/1000)});if(initialUnit>0)p.lastCost=initialUnit;}}
     if(v.trayAvailable!==undefined){tray.available+=positive(v.trayAvailable,'Tray awal');tray.unitCost=positive(v.trayCost||0,'Modal tray awal');}
     if(v.trayBroken!==undefined)tray.broken+=positive(v.trayBroken,'Tray rusak awal');
     if(v.partyId){let c=owner(v.partyId);const openingDebt=positive(v.debt||0,'Bon awal');c.debt+=openingDebt;c.trayDue+=positive(v.trayDue||0,'Saldo tray awal');if(openingDebt)invoices[e.id]={id:e.id,partyId:v.partyId,revenue:openingDebt,paid:0,debt:openingDebt,date:e.date,channel:'opening',pay:'credit',opening:true};}
@@ -54,25 +54,32 @@ export function replay(events){
     if(bought){const own=tray.available-inN+out;tray.unitCost=Math.round(((own||0)*tray.unitCost+bought*positive(v.trayPrice||0,'Harga tray'))/Math.max(1,own+bought));}
     if(v.partyId){const c=owner(v.partyId);required(c.kind==='supplier','Kulak harus memilih supplier.');c.trayDue+=inN-out-bought;}
     else required(inN===out+bought,'Pilih supplier jika ada saldo tray yang belum diselesaikan.');
-    const unit=(weight*price/1000+extra)*1000/weight;p.lots.push({source:e.id,qty:weight,initialQty:weight,unit,totalCost:Math.round(weight*price/1000)+extra});
+    const unit=(weight*price/1000+extra)*1000/weight;p.lots.push({source:e.id,qty:weight,initialQty:weight,unit,totalCost:Math.round(weight*price/1000)+extra});p.lastCost=unit;
     outcomes[e.id]={amount:Math.round(weight*price/1000)+bought*(v.trayPrice||0)+extra,weight,trayIn:inN,trayOut:out};cashPost(e,-outcomes[e.id].amount,v.pay||'cash');add(e,0);break;
    }
    case 'sale':{
-    const p=egg(v.productId),weight=positive(v.weight,'Berat jual'),out=positive(v.trayOut||0,'Tray keluar'),incoming=positive(v.trayIn||0,'Tray kembali'),bought=positive(v.trayBought||0,'Tray dibeli'),price=positive(v.price||0,'Harga jual'),ship=positive(v.delivery||0,'Ongkir'),cost=positive(v.extra||0,'Biaya tambahan');
+    const rawItems=Array.isArray(v.items)&&v.items.length?v.items:[{productId:v.productId,weight:v.weight,price:v.price,specialPrice:!!v.specialPrice}];
+    const saleItems=rawItems.map((it,index)=>({productId:String(it.productId||''),weight:positive(Number(it.weight)||0,'Berat jual item '+(index+1)),price:positive(Number(it.price)||0,'Harga jual item '+(index+1)),specialPrice:!!it.specialPrice}));
+    required(saleItems.length>0,'Minimal satu jenis telur wajib diisi.');
+    const ids=new Set();for(const it of saleItems){required(it.productId,'Pilih jenis telur.');required(it.weight>0,'Berat penjualan wajib diisi.');required(!ids.has(it.productId),'Jenis telur yang sama tidak boleh ditambahkan dua kali dalam satu transaksi.');ids.add(it.productId)}
+    const out=positive(v.trayOut||0,'Tray keluar'),incoming=positive(v.trayIn||0,'Tray kembali'),bought=positive(v.trayBought||0,'Tray dibeli'),ship=positive(v.delivery||0,'Ongkir'),cost=positive(v.extra||0,'Biaya tambahan');
     required(bought<=out,'Tray dibeli melebihi tray keluar.');required(incoming<=out-bought,'Jumlah tray diterima melebihi tray yang ditukar.');available(out,ref);
-    const fifo=takeFIFO(p,weight,ref),unitTrayCost=tray.unitCost;
-    tray.available+=incoming-out;
+    const isShopee=v.channel==='shopee',itemBreakdown=[];let eggRevenue=0,eggCogs=0,totalWeight=0;
+    for(const it of saleItems){const p=egg(it.productId),fifo=takeFIFO(p,it.weight,ref),itemRevenue=isShopee?0:Math.round(it.weight*it.price/1000);let itemCogs=fifo.cost;
+      const zeroCostQty=isShopee?fifo.used.filter(x=>!(Number(x.unit)>0)).reduce((n,x)=>n+(Number(x.qty)||0),0):0;
+      const fallback=zeroCostQty>0&&p.lastCost>0?Math.round(zeroCostQty*p.lastCost/1000):0;itemCogs+=fallback;
+      p.lastPrice=it.price;eggRevenue+=itemRevenue;eggCogs+=itemCogs;totalWeight+=it.weight;itemBreakdown.push({...it,revenue:itemRevenue,cogs:itemCogs,fifo:fifo.used,cogsFallback:fallback});
+    }
+    const unitTrayCost=tray.unitCost;tray.available+=incoming-out;
     if(v.partyId){const c=owner(v.partyId);required(c.kind==='customer','Penjualan harus memilih customer.');c.trayDue+=out-incoming-bought;required(c.trayDue>=0,'Saldo tray customer menjadi negatif.');}
     else required(out===incoming+bought,'Pilih customer untuk tray yang belum dikembalikan.');
-    const isShopee=v.channel==='shopee';
-    const revenue=isShopee?positive(v.net||0,'Uang bersih Shopee'):Math.round(weight*price/1000)+ship+bought*positive(v.trayPrice||0,'Harga jual tray');
+    const trayRevenue=bought*positive(v.trayPrice||0,'Harga jual tray'),revenue=isShopee?positive(v.net||0,'Uang bersih Shopee'):eggRevenue+ship+trayRevenue;
     required(revenue>0,'Total penjualan harus lebih dari nol.');
-    const paid=isShopee?revenue:positive(v.paid??revenue,'Dibayar sekarang');required(paid<=revenue,'Pembayaran awal melebihi total tagihan.');
-    if(paid<revenue)required(v.partyId,'Pilih customer untuk transaksi bon.');
+    const paid=isShopee?revenue:positive(v.paid??revenue,'Dibayar sekarang');required(paid<=revenue,'Pembayaran awal melebihi total tagihan.');if(paid<revenue)required(v.partyId,'Pilih customer untuk transaksi bon.');
     const due=revenue-paid;if(v.partyId)contacts[v.partyId].debt+=due;
-    invoices[e.id]={id:e.id,partyId:v.partyId||'',productId:v.productId,weight,revenue,paid,debt:due,channel:v.channel||'offline',pay:v.pay||'cash',date:e.date};
-    p.lastPrice=price;cashPost(e,paid,isShopee?'transfer':v.pay||'cash');
-    const cogs=fifo.cost+bought*unitTrayCost;outcomes[e.id]={...invoices[e.id],fifo:fifo.used,trayOut:out,trayIn:incoming,trayBought:bought};add(e,revenue-cogs-cost,revenue,cogs,cost);break;
+    const first=saleItems[0];invoices[e.id]={id:e.id,partyId:v.partyId||'',productId:first.productId,weight:totalWeight,items:itemBreakdown.map(x=>({productId:x.productId,weight:x.weight,price:x.price,specialPrice:x.specialPrice})),revenue,paid,debt:due,channel:v.channel||'offline',pay:v.pay||'cash',date:e.date};
+    cashPost(e,paid,isShopee?'transfer':v.pay||'cash');
+    const cogs=eggCogs+bought*unitTrayCost;outcomes[e.id]={...invoices[e.id],itemBreakdown,fifo:itemBreakdown.flatMap(x=>x.fifo.map(f=>({...f,productId:x.productId}))),trayOut:out,trayIn:incoming,trayBought:bought,cogsFallback:itemBreakdown.reduce((n,x)=>n+(x.cogsFallback||0),0)};add(e,revenue-cogs-cost,revenue,cogs,cost);break;
    }
    case 'tray':{
     const out=positive(v.out||0,'Tray keluar'),incoming=positive(v.in||0,'Tray masuk'),mode=v.mode,price=positive(v.price||0,'Harga tray'),c=v.partyId?owner(v.partyId):null;required(['buy','sell','convert','loan','return','swap','broken','replace'].includes(mode),'Jenis transaksi tray tidak valid.');
@@ -92,9 +99,7 @@ export function replay(events){
     const c=v.partyId?owner(v.partyId):null;required(direction==='internal'||c?.kind===direction,'Pilih customer atau supplier yang sesuai retur.');
     let channel=v.channel||'shared';
     if(v.invoiceId){
-      const i=invoices[v.invoiceId];required(direction==='customer'&&i&&!i.opening&&i.partyId===v.partyId&&i.productId===v.productId,'Nota penjualan asal retur tidak sesuai customer atau jenis telur.');
-      returnedWeight[v.invoiceId]=(returnedWeight[v.invoiceId]||0)+weight;
-      required(returnedWeight[v.invoiceId]<=i.weight,'Total berat retur melebihi berat pada nota asal.');channel=i.channel;
+      const i=invoices[v.invoiceId];required(direction==='customer'&&i&&!i.opening&&i.partyId===v.partyId,'Nota penjualan asal retur tidak sesuai customer.');const invItems=Array.isArray(i.items)&&i.items.length?i.items:[{productId:i.productId,weight:i.weight}];const invItem=invItems.find(x=>x.productId===v.productId);required(invItem,'Jenis telur tidak ada pada nota asal.');const returnKey=v.invoiceId+'|'+v.productId;returnedWeight[returnKey]=(returnedWeight[returnKey]||0)+weight;required(returnedWeight[returnKey]<=invItem.weight,'Total berat retur melebihi berat jenis telur pada nota asal.');channel=i.channel;
     }
     let loss=0;if(direction!=='customer')loss=takeFIFO(p,weight,ref).cost;
     const refund=positive(v.refund||0,'Nilai refund');
@@ -134,7 +139,7 @@ export function replay(events){
    }
    case 'expense':{const amount=positive(v.amount,'Biaya usaha');required(amount>0,'Biaya wajib diisi.');cashPost(e,-amount,v.pay||'cash');add(e,-amount,0,0,amount);break;}
    case 'adjust':{
-    if(v.productId){const p=egg(v.productId);const actual=positive(v.actual,'Stok fisik');const current=p.lots.reduce((a,l)=>a+l.qty,0);if(actual<current){const cost=takeFIFO(p,current-actual,ref).cost;add(e,-cost,0,cost);}else if(actual>current){p.lots.push({source:e.id,qty:actual-current,initialQty:actual-current,unit:positive(v.price||0,'Modal penyesuaian'),totalCost:Math.round((actual-current)*(v.price||0)/1000)});add(e,0);}else add(e,0);
+    if(v.productId){const p=egg(v.productId);const actual=positive(v.actual,'Stok fisik');const current=p.lots.reduce((a,l)=>a+l.qty,0);if(actual<current){const cost=takeFIFO(p,current-actual,ref).cost;add(e,-cost,0,cost);}else if(actual>current){const adjUnit=positive(v.price||0,'Modal penyesuaian');p.lots.push({source:e.id,qty:actual-current,initialQty:actual-current,unit:adjUnit,totalCost:Math.round((actual-current)*adjUnit/1000)});if(adjUnit>0)p.lastCost=adjUnit;add(e,0);}else add(e,0);
     }else{tray.available=positive(v.trayAvailable,'Tray layak');tray.broken=positive(v.trayBroken||0,'Tray rusak');tray.unitCost=positive(v.trayCost||0,'Modal tray');add(e,0);}break;
    }
    default:throw Error('Jenis transaksi belum didukung: '+e.type);

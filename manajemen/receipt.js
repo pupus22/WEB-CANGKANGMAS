@@ -8,8 +8,8 @@ export async function makeReceiptPNG(entry){
  const logo=await loadLogo();
  const W=1000,L=38,R=962,ink='#252c32',cream='#fff2cf',pale='#fff8e9',red='#df1726',gray='#30373b',bg='#fffefa';
  const n=v=>Number(v)||0,weight=n(entry.weight),price=n(entry.price),delivery=n(entry.delivery),out=n(entry.trayOut),bought=n(entry.trayBought),gross=n(entry.revenue);
- const shopee=entry.channel==='shopee',trayTotal=shopee?0:bought*n(entry.trayPrice),eggTotal=shopee?gross:Math.max(0,gross-delivery-trayTotal);
- const rows=[{name:'Telur '+clean(entry.productName||''),qty:fmt(weight)+' gram',price:shopee?'—':rp(price),sum:rp(eggTotal)}];
+ const shopee=entry.channel==='shopee',trayTotal=shopee?0:bought*n(entry.trayPrice),eggTotal=shopee?gross:Math.max(0,gross-delivery-trayTotal),items=Array.isArray(entry.items)&&entry.items.length?entry.items:[{productName:entry.productName,weight,price,revenue:eggTotal}];
+ const rows=items.map((it,i)=>{const allocated=shopee?Math.round(eggTotal*(n(it.weight)||0)/Math.max(1,items.reduce((a,x)=>a+n(x.weight),0))):n(it.revenue)||Math.round(n(it.weight)*n(it.price)/1000);return {name:'Telur '+clean(it.productName||''),qty:fmt(n(it.weight))+' gram',price:shopee?'—':rp(n(it.price)),sum:rp(allocated)}});
  if(out>0)rows.push({name:bought===out?'Tray (beli)':bought>0?'Tray (tukar + beli)':entry.trayMode==='loan'?'Tray (pinjam)':'Tray (tukar)',qty:fmt(out)+' pcs',price:bought&&!shopee?rp(entry.trayPrice):'—',sum:rp(trayTotal)});
  if(delivery>0&&!shopee)rows.push({name:'Ongkir',qty:'—',price:'—',sum:rp(delivery)});
  const debt=Math.max(0,n(entry.debt)),tableY=445,headH=62,rowH=70,tableEnd=tableY+headH+rows.length*rowH,totalY=tableEnd+34;
