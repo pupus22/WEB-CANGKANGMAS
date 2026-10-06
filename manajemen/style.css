@@ -189,3 +189,12 @@
 
 /* Revisi 1 · rincian FIFO */
 .fifo-block{margin-top:14px;padding:12px;border:1px solid #e4edf7;border-radius:12px;background:#f8fbff}.fifo-block>b{display:block;margin-bottom:6px}.fifo-block .shared-detail-list{margin-top:4px}
+
+/* Revisi Log Aktivitas: tampilkan perubahan dalam bahasa manusia, bukan JSON mentah. */
+.audit-change-list{display:grid;gap:10px;margin-top:10px}
+.audit-change-row{border:1px solid var(--line,#dbe5f0);border-radius:12px;padding:12px;background:#f8fbff;display:grid;grid-template-columns:minmax(120px,.7fr) minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:start}
+.audit-change-row>b{font-size:13px;padding-top:5px}
+.audit-change-row>div{display:grid;gap:3px;min-width:0}
+.audit-change-row span{font-size:11px;color:var(--muted,#64748b)}
+.audit-change-row strong{font-size:13px;overflow-wrap:anywhere}
+@media(max-width:640px){.audit-change-row{grid-template-columns:1fr}.audit-change-row>b{padding-top:0}}
