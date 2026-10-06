@@ -186,3 +186,6 @@
 
 /* Detail sumber Biaya bersama / penyesuaian pada laporan */
 .report-summary-click{width:100%;border:0;background:transparent;padding:8px 0;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;color:#172b46;cursor:pointer;font:inherit}.report-summary-click:hover{background:#f5f9ff;border-radius:9px;padding-left:8px;padding-right:8px}.report-summary-click span{min-width:0}.report-summary-click b{display:block}.report-summary-click small{display:block;color:#70859f;margin-top:3px;font-size:11px;font-weight:500}.report-summary-click strong{white-space:nowrap;color:#174e8b}.shared-detail-list{margin-top:12px}.shared-detail-list .report-list-button:last-child{border-bottom:0}
+
+/* Revisi 1 · rincian FIFO */
+.fifo-block{margin-top:14px;padding:12px;border:1px solid #e4edf7;border-radius:12px;background:#f8fbff}.fifo-block>b{display:block;margin-bottom:6px}.fifo-block .shared-detail-list{margin-top:4px}

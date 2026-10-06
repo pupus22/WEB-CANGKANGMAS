@@ -85,3 +85,34 @@ test('penggantian telur Pembeli umum dapat diselesaikan dan mengurangi stok',()=
  assert.equal(r.stock.horn,900);
 });
 console.log('TOTAL FINAL '+tests+' pengujian lulus');
+test('timestamp mengurutkan transaksi dalam hari yang sama',()=>{
+ const pp=E('product','2026-10-05',{name:'OMEGA'},'omega-time');
+ const ss=E('contact','2026-10-05',{name:'Supplier A',kind:'supplier'},'sup-time');
+ const buy=E('purchase','2026-10-05',{productId:'omega-time',partyId:'sup-time',weight:2000,price:24000,time:'08:00'},'buy-time');
+ const sell=E('sale','2026-10-05',{productId:'omega-time',weight:1000,price:30000,channel:'offline',time:'09:00'},'sell-time');
+ const r=replay([pp,ss,sell,buy]);
+ assert.equal(r.stock['omega-time'],1000);
+});
+test('stok opname tertaut kulak lama tetap FIFO sebelum kulak baru',()=>{
+ const pp=E('product','2026-10-04',{name:'OMEGA'},'omega-fifo');
+ const ss=E('contact','2026-10-04',{name:'Supplier Lama',kind:'supplier'},'sup-old');
+ const buyOld=E('purchase','2026-10-04',{productId:'omega-fifo',partyId:'sup-old',weight:20000,price:24000,time:'08:00'},'buy-old');
+ const sellOld=E('sale','2026-10-04',{productId:'omega-fifo',weight:20000,price:30000,channel:'offline',time:'09:00'},'sell-old');
+ const adjust=E('adjust','2026-10-05',{productId:'omega-fifo',actual:1450,price:0,sourcePurchaseId:'buy-old',time:'08:00'},'adj-old');
+ const sell1=E('sale','2026-10-05',{productId:'omega-fifo',weight:1000,price:30000,channel:'offline',time:'09:00'},'sell-1');
+ const buyNew=E('purchase','2026-10-05',{productId:'omega-fifo',partyId:'sup-old',weight:20000,price:24500,time:'10:00'},'buy-new');
+ const sell2=E('sale','2026-10-05',{productId:'omega-fifo',weight:2000,price:30000,channel:'offline',time:'11:00'},'sell-2');
+ const r=replay([pp,ss,buyOld,sellOld,adjust,sell1,buyNew,sell2]);
+ assert.equal(r.stock['omega-fifo'],18450);
+ const fifo=r.outcomes['sell-2'].itemBreakdown[0].fifo;
+ assert.equal(fifo[0].source,'adj-old');assert.equal(fifo[0].qty,450);assert.equal(fifo[0].sourcePurchaseId,'buy-old');
+ assert.equal(fifo[1].source,'buy-new');assert.equal(fifo[1].qty,1550);
+});
+test('stok opname tidak boleh menautkan kulak yang terjadi sesudahnya',()=>{
+ const pp=E('product','2026-10-05',{name:'OMEGA'},'omega-invalid');
+ const ss=E('contact','2026-10-05',{name:'Supplier B',kind:'supplier'},'sup-invalid');
+ const adjust=E('adjust','2026-10-05',{productId:'omega-invalid',actual:1000,price:0,sourcePurchaseId:'buy-later',time:'08:00'},'adj-invalid');
+ const buyLater=E('purchase','2026-10-05',{productId:'omega-invalid',partyId:'sup-invalid',weight:20000,price:24000,time:'10:00'},'buy-later');
+ assert.throws(()=>replay([pp,ss,adjust,buyLater]),/Sumber kulak harus terjadi sebelum stok opname/);
+});
+console.log('TOTAL REVISI 1 '+tests+' pengujian lulus');

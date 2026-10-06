@@ -25,8 +25,9 @@ export async function makeReceiptPNG(entry){
  logoAt(317,45,520);fit('T E L U R   S E G A R   S E T I A P   H A R I',244,162,324,13);
  text('KEBRAON INDAH PERMAI D.38',L+22,210,20);text('SURABAYA',L+22,242,20);
  fit('0857-3192-9628 / 0813-5857-8824',L+22,278,515,20);
+ fit('cangkangmas.id',L+22,307,515,18,true);
  rect(617,68,1,235,'#e1cba4');text('INVOICE',R-14,187,72,true,'right');
- const dt=clean(entry.date);let date=dt;if(/^\d{4}-\d{2}-\d{2}$/.test(dt)){const [y,m,d]=dt.split('-');date=`${d}-${m}-${y}`;}
+ const dt=clean(entry.date);let date=dt;if(/^\d{4}-\d{2}-\d{2}$/.test(dt)){const [y,m,d]=dt.split('-');date=`${d}-${m}-${y}`;}if(entry.time)date+=` ${clean(entry.time)}`;
  const invoice=clean(entry.invoiceNo||`INV-${dt.replace(/-/g,'')}-${clean(entry.id).slice(0,6).toUpperCase()}`);
  text('TANGGAL',645,257,17,true);fit(date||'—',R-14,257,197,18,false,'right');
  text('NO. INVOICE',645,291,17,true);fit(invoice,R-14,291,197,18,false,'right');
