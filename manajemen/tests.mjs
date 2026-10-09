@@ -141,3 +141,39 @@ test('retur supplier menyimpan sumber FIFO untuk laporan batch',()=>{
  assert.equal(r.outcomes['ret-batch'].cogs,11000);
 });
 console.log('TOTAL LAPORAN BATCH '+tests+' pengujian lulus');
+test('kulak multi-item satu supplier membuat lot FIFO terpisah per jenis dan harga',()=>{
+ const horn=E('product','2026-10-12',{name:'HORN'},'horn-multi-buy');
+ const omega=E('product','2026-10-12',{name:'OMEGA'},'omega-multi-buy');
+ const sup=E('contact','2026-10-12',{name:'Supplier Multi',kind:'supplier'},'sup-multi-buy');
+ const buy=E('purchase','2026-10-12',{partyId:'sup-multi-buy',time:'08:00',items:[{productId:'horn-multi-buy',weight:80000,price:22500},{productId:'omega-multi-buy',weight:20000,price:24000}],extra:10000,pay:'cash'},'buy-multi');
+ const r=replay([horn,omega,sup,buy]);
+ assert.equal(r.stock['horn-multi-buy'],80000);assert.equal(r.stock['omega-multi-buy'],20000);
+ assert.equal(r.products['horn-multi-buy'].lots[0].sourcePurchaseId,'buy-multi::0');
+ assert.equal(r.products['omega-multi-buy'].lots[0].sourcePurchaseId,'buy-multi::1');
+ assert.equal(r.outcomes['buy-multi'].itemBreakdown.length,2);
+ assert.equal(r.outcomes['buy-multi'].amount,2290000);
+});
+test('penjualan setelah kulak multi-item memakai HPP harga item masing-masing',()=>{
+ const horn=E('product','2026-10-13',{name:'HORN'},'horn-multi-cogs');
+ const omega=E('product','2026-10-13',{name:'OMEGA'},'omega-multi-cogs');
+ const sup=E('contact','2026-10-13',{name:'Supplier Multi',kind:'supplier'},'sup-multi-cogs');
+ const buy=E('purchase','2026-10-13',{partyId:'sup-multi-cogs',items:[{productId:'horn-multi-cogs',weight:10000,price:22000},{productId:'omega-multi-cogs',weight:10000,price:26000}],extra:0},'buy-multi-cogs');
+ const sell=E('sale','2026-10-13',{items:[{productId:'horn-multi-cogs',weight:1000,price:28000},{productId:'omega-multi-cogs',weight:1000,price:32000}],channel:'offline',paid:60000},'sell-multi-cogs');
+ const r=replay([horn,omega,sup,buy,sell]);
+ assert.equal(r.outcomes['sell-multi-cogs'].cogs,48000);
+ assert.equal(r.outcomes['sell-multi-cogs'].itemBreakdown[0].fifo[0].sourcePurchaseId,'buy-multi-cogs::0');
+ assert.equal(r.outcomes['sell-multi-cogs'].itemBreakdown[1].fifo[0].sourcePurchaseId,'buy-multi-cogs::1');
+});
+test('stok opname dapat menautkan item tertentu dari kulak multi-item',()=>{
+ const horn=E('product','2026-10-14',{name:'HORN'},'horn-multi-adj');
+ const omega=E('product','2026-10-14',{name:'OMEGA'},'omega-multi-adj');
+ const sup=E('contact','2026-10-14',{name:'Supplier Multi',kind:'supplier'},'sup-multi-adj');
+ const buy=E('purchase','2026-10-14',{partyId:'sup-multi-adj',time:'08:00',items:[{productId:'horn-multi-adj',weight:5000,price:22000},{productId:'omega-multi-adj',weight:5000,price:26000}]},'buy-multi-adj');
+ const adj=E('adjust','2026-10-14',{productId:'omega-multi-adj',actual:4000,price:0,sourcePurchaseId:'buy-multi-adj::1',time:'09:00'},'adj-multi-item');
+ const r=replay([horn,omega,sup,buy,adj]);
+ assert.equal(r.outcomes['adj-multi-item'].adjustQty,-1000);
+ assert.equal(r.outcomes['adj-multi-item'].fifo[0].sourcePurchaseId,'buy-multi-adj::1');
+ assert.equal(r.outcomes['adj-multi-item'].cogs,26000);
+ assert.equal(r.stock['horn-multi-adj'],5000);assert.equal(r.stock['omega-multi-adj'],4000);
+});
+console.log('TOTAL KULAK MULTI-ITEM '+tests+' pengujian lulus');

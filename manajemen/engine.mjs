@@ -12,6 +12,9 @@ const eventTime=e=>String(e?.time||e?.data?.time||'');
 const hasTime=e=>/^([01]\d|2[0-3]):[0-5]\d$/.test(eventTime(e));
 export const compareEvents=(a,b)=>{const dc=String(a.date||'').localeCompare(String(b.date||''));if(dc)return dc;const ah=hasTime(a),bh=hasTime(b),at=ah?eventTime(a):'12:00',bt=bh?eventTime(b):'12:00';if(at!==bt)return at.localeCompare(bt);return (a.seq||0)-(b.seq||0)||String(a.id||'').localeCompare(String(b.id||''));};
 export const eventDateTime=e=>String(e?.date||'')+(hasTime(e)?' '+eventTime(e):'');
+const purchaseItemsOf=v=>Array.isArray(v?.items)&&v.items.length?v.items.map(x=>({...x})):(v?.productId?[{productId:v.productId,weight:v.weight||0,price:v.price||0,bundle:v.bundle||10000,bundleCount:v.bundleCount||0,actual:!!v.actual}]:[]);
+const purchaseLotKey=(e,index)=>Array.isArray(e?.data?.items)&&e.data.items.length?`${e.id}::${index}`:e.id;
+const purchaseLotRef=(eventsById,key)=>{const raw=String(key||''),m=raw.match(/^(.*)::(\d+)$/),eventId=m?m[1]:raw,index=m?Number(m[2]):0,e=eventsById[eventId];if(!e||e.type!=='purchase')return null;const items=purchaseItemsOf(e.data);const item=items[index];return item?{event:e,eventId,index,item,lotId:purchaseLotKey(e,index)}:null;};
 const takeFIFO=(item,qty,ref,filter=null)=>{
   required(item,'Jenis telur tidak ditemukan pada '+ref);required(qty>0,'Berat harus lebih dari nol.');
   let rem=qty,cost=0,used=[];
@@ -53,14 +56,16 @@ export function replay(events){
     break;
    }
    case 'purchase':{
-    const p=egg(v.productId),weight=positive(v.weight,'Berat kulak'),price=positive(v.price,'Harga kulak'),extra=positive(v.extra||0,'Biaya kulak');required(weight>0,'Berat kulak wajib lebih dari nol.');
+    const items=purchaseItemsOf(v).map((it,index)=>({productId:String(it.productId||''),weight:positive(Number(it.weight)||0,'Berat kulak item '+(index+1)),price:positive(Number(it.price)||0,'Harga kulak item '+(index+1)),bundle:positive(Number(it.bundle)||10000,'Ukuran ikat item '+(index+1)),bundleCount:positive(Number(it.bundleCount)||0,'Jumlah ikat item '+(index+1)),actual:!!it.actual}));
+    required(items.length>0,'Minimal satu jenis telur wajib diisi saat kulak.');const ids=new Set();for(const it of items){required(it.productId,'Pilih jenis telur pada setiap item kulak.');required(it.weight>0&&it.price>0,'Berat dan harga kulak tiap item wajib lebih dari nol.');required(!ids.has(it.productId),'Jenis telur yang sama tidak boleh ditambahkan dua kali dalam satu transaksi kulak.');ids.add(it.productId);egg(it.productId)}
+    const extra=positive(v.extra||0,'Biaya kulak'),baseValues=items.map(it=>Math.round(it.weight*it.price/1000)),baseTotal=baseValues.reduce((a,b)=>a+b,0),extraAlloc=[];let assigned=0;items.forEach((it,i)=>{const a=i===items.length-1?extra-assigned:Math.round(extra*baseValues[i]/Math.max(1,baseTotal));extraAlloc.push(a);assigned+=a});
     const inN=positive(v.trayIn||0,'Tray diterima'),out=positive(v.trayOut||0,'Tray ditukar'),bought=positive(v.trayBought||0,'Tray dibeli');required(out+bought<=inN,'Tray ditukar dan dibeli tidak boleh lebih dari tray yang diterima.');available(out,ref);
     tray.available+=inN-out;
     if(bought){const own=tray.available-inN+out;tray.unitCost=Math.round(((own||0)*tray.unitCost+bought*positive(v.trayPrice||0,'Harga tray'))/Math.max(1,own+bought));}
     if(v.partyId){const c=owner(v.partyId);required(c.kind==='supplier','Kulak harus memilih supplier.');c.trayDue+=inN-out-bought;}
     else required(inN===out+bought,'Pilih supplier jika ada saldo tray yang belum diselesaikan.');
-    const unit=(weight*price/1000+extra)*1000/weight;p.lots.push({source:e.id,sourceType:'purchase',sourcePurchaseId:e.id,qty:weight,initialQty:weight,unit,totalCost:Math.round(weight*price/1000)+extra});p.lastCost=unit;
-    outcomes[e.id]={amount:Math.round(weight*price/1000)+bought*(v.trayPrice||0)+extra,weight,trayIn:inN,trayOut:out};cashPost(e,-outcomes[e.id].amount,v.pay||'cash');add(e,0);break;
+    const itemBreakdown=[];let totalWeight=0,totalEggCost=0;items.forEach((it,index)=>{const p=egg(it.productId),lotId=purchaseLotKey(e,index),totalCost=baseValues[index]+extraAlloc[index],unit=totalCost*1000/it.weight;p.lots.push({source:e.id,sourceType:'purchase',sourcePurchaseId:lotId,qty:it.weight,initialQty:it.weight,unit,totalCost});p.lastCost=unit;totalWeight+=it.weight;totalEggCost+=totalCost;itemBreakdown.push({...it,lotId,allocatedExtra:extraAlloc[index],totalCost,unit})});
+    outcomes[e.id]={amount:totalEggCost+bought*(v.trayPrice||0),weight:totalWeight,trayIn:inN,trayOut:out,itemBreakdown};cashPost(e,-outcomes[e.id].amount,v.pay||'cash');add(e,0);break;
    }
    case 'sale':{
     const rawItems=Array.isArray(v.items)&&v.items.length?v.items:[{productId:v.productId,weight:v.weight,price:v.price,specialPrice:!!v.specialPrice}];
@@ -147,7 +152,7 @@ export function replay(events){
    case 'adjust':{
     if(v.productId){
       const p=egg(v.productId),actual=positive(v.actual,'Stok fisik'),current=p.lots.reduce((a,l)=>a+l.qty,0),sourcePurchaseId=String(v.sourcePurchaseId||'');
-      if(sourcePurchaseId){const src=eventById[sourcePurchaseId];required(src&&src.type==='purchase','Sumber kulak stok opname tidak ditemukan.');required(src.data?.productId===v.productId,'Sumber kulak tidak sesuai jenis telur.');required(processed.has(sourcePurchaseId),'Sumber kulak harus terjadi sebelum stok opname.');}
+      if(sourcePurchaseId){const srcRef=purchaseLotRef(eventById,sourcePurchaseId);required(srcRef,'Sumber kulak stok opname tidak ditemukan.');required(srcRef.item?.productId===v.productId,'Sumber kulak tidak sesuai jenis telur.');required(processed.has(srcRef.eventId),'Sumber kulak harus terjadi sebelum stok opname.');}
       if(actual<current){const qty=current-actual,taken=sourcePurchaseId?takeFIFO(p,qty,ref,l=>l.sourcePurchaseId===sourcePurchaseId):takeFIFO(p,qty,ref);outcomes[e.id]={fifo:taken.used,adjustQty:-qty,sourcePurchaseId};add(e,-taken.cost,0,taken.cost);}
       else if(actual>current){const adjUnit=positive(v.price||0,'Modal penyesuaian'),qty=actual-current;p.lots.push({source:e.id,sourceType:'adjust',sourcePurchaseId,qty,initialQty:qty,unit:adjUnit,totalCost:Math.round(qty*adjUnit/1000)});if(adjUnit>0)p.lastCost=adjUnit;outcomes[e.id]={adjustQty:qty,sourcePurchaseId,adjustUnit:adjUnit};add(e,0);}
       else {outcomes[e.id]={adjustQty:0,sourcePurchaseId};add(e,0);}
