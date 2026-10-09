@@ -116,3 +116,28 @@ test('stok opname tidak boleh menautkan kulak yang terjadi sesudahnya',()=>{
  assert.throws(()=>replay([pp,ss,adjust,buyLater]),/Sumber kulak harus terjadi sebelum stok opname/);
 });
 console.log('TOTAL REVISI 1 '+tests+' pengujian lulus');
+test('stok opname kurang tertaut batch mengurangi lot kulak yang dipilih',()=>{
+ const pp=E('product','2026-10-10',{name:'OMEGA'},'omega-batch-loss');
+ const ss=E('contact','2026-10-10',{name:'Supplier X',kind:'supplier'},'sup-batch-loss');
+ const b1=E('purchase','2026-10-10',{productId:'omega-batch-loss',partyId:'sup-batch-loss',weight:5000,price:20000,time:'08:00'},'batch-loss-1');
+ const b2=E('purchase','2026-10-10',{productId:'omega-batch-loss',partyId:'sup-batch-loss',weight:5000,price:30000,time:'09:00'},'batch-loss-2');
+ const adj=E('adjust','2026-10-10',{productId:'omega-batch-loss',actual:9000,price:0,sourcePurchaseId:'batch-loss-2',time:'10:00'},'batch-loss-adj');
+ const r=replay([pp,ss,b1,b2,adj]);
+ assert.equal(r.stock['omega-batch-loss'],9000);
+ assert.equal(r.outcomes['batch-loss-adj'].adjustQty,-1000);
+ assert.equal(r.outcomes['batch-loss-adj'].fifo[0].sourcePurchaseId,'batch-loss-2');
+ assert.equal(r.outcomes['batch-loss-adj'].cogs,30000);
+ const remain1=r.products['omega-batch-loss'].lots.filter(x=>x.sourcePurchaseId==='batch-loss-1').reduce((n,x)=>n+x.qty,0);
+ const remain2=r.products['omega-batch-loss'].lots.filter(x=>x.sourcePurchaseId==='batch-loss-2').reduce((n,x)=>n+x.qty,0);
+ assert.equal(remain1,5000);assert.equal(remain2,4000);
+});
+test('retur supplier menyimpan sumber FIFO untuk laporan batch',()=>{
+ const pp=E('product','2026-10-11',{name:'HORN'},'horn-ret-batch');
+ const ss=E('contact','2026-10-11',{name:'Supplier R',kind:'supplier'},'sup-ret-batch');
+ const b=E('purchase','2026-10-11',{productId:'horn-ret-batch',partyId:'sup-ret-batch',weight:3000,price:22000,time:'08:00'},'buy-ret-batch');
+ const ret=E('return','2026-10-11',{direction:'supplier',partyId:'sup-ret-batch',productId:'horn-ret-batch',weight:500,resolution:'none',time:'09:00'},'ret-batch');
+ const r=replay([pp,ss,b,ret]);
+ assert.equal(r.outcomes['ret-batch'].fifo[0].sourcePurchaseId,'buy-ret-batch');
+ assert.equal(r.outcomes['ret-batch'].cogs,11000);
+});
+console.log('TOTAL LAPORAN BATCH '+tests+' pengujian lulus');

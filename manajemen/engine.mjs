@@ -12,17 +12,17 @@ const eventTime=e=>String(e?.time||e?.data?.time||'');
 const hasTime=e=>/^([01]\d|2[0-3]):[0-5]\d$/.test(eventTime(e));
 export const compareEvents=(a,b)=>{const dc=String(a.date||'').localeCompare(String(b.date||''));if(dc)return dc;const ah=hasTime(a),bh=hasTime(b),at=ah?eventTime(a):'12:00',bt=bh?eventTime(b):'12:00';if(at!==bt)return at.localeCompare(bt);return (a.seq||0)-(b.seq||0)||String(a.id||'').localeCompare(String(b.id||''));};
 export const eventDateTime=e=>String(e?.date||'')+(hasTime(e)?' '+eventTime(e):'');
-const takeFIFO=(item,qty,ref)=>{
+const takeFIFO=(item,qty,ref,filter=null)=>{
   required(item,'Jenis telur tidak ditemukan pada '+ref);required(qty>0,'Berat harus lebih dari nol.');
   let rem=qty,cost=0,used=[];
-  for(const lot of item.lots){const amount=Math.min(rem,lot.qty);if(amount>0){
+  for(const lot of item.lots){if(filter&&!filter(lot))continue;const amount=Math.min(rem,lot.qty);if(amount>0){
     const initialQty=lot.initialQty||lot.qty, totalCost=lot.totalCost??Math.round(initialQty*lot.unit/1000);
     const before=initialQty-lot.qty,after=before+amount;
-    cost+=Math.round(after*totalCost/initialQty)-Math.round(before*totalCost/initialQty);
-    lot.qty-=amount;rem-=amount;used.push({source:lot.source,qty:amount,unit:lot.unit,sourceType:lot.sourceType||'',sourcePurchaseId:lot.sourcePurchaseId||''});
+    const pieceCost=Math.round(after*totalCost/initialQty)-Math.round(before*totalCost/initialQty);cost+=pieceCost;
+    lot.qty-=amount;rem-=amount;used.push({source:lot.source,qty:amount,unit:lot.unit,cost:pieceCost,sourceType:lot.sourceType||'',sourcePurchaseId:lot.sourcePurchaseId||''});
   }}
   item.lots=item.lots.filter(l=>l.qty>0);
-  if(rem>0)throw Error('Stok '+item.name+' kurang '+fmt(rem)+' gram pada '+ref+'. Periksa kulak atau transaksi keluar sebelumnya.');
+  if(rem>0)throw Error((filter?'Stok lot kulak terpilih ':'Stok '+item.name+' ' )+'kurang '+fmt(rem)+' gram pada '+ref+'. Periksa sumber kulak atau transaksi keluar sebelumnya.');
   return {cost:Math.round(cost),used};
 };
 export function replay(events){
@@ -107,7 +107,7 @@ export function replay(events){
     if(v.invoiceId){
       const i=sourceInvoice;required(direction==='customer'&&i&&!i.opening&&(i.partyId||'')===(v.partyId||''),'Nota penjualan asal retur tidak sesuai customer.');const invItems=Array.isArray(i.items)&&i.items.length?i.items:[{productId:i.productId,weight:i.weight}];const invItem=invItems.find(x=>x.productId===v.productId);required(invItem,'Jenis telur tidak ada pada nota asal.');const returnKey=v.invoiceId+'|'+v.productId;returnedWeight[returnKey]=(returnedWeight[returnKey]||0)+weight;required(returnedWeight[returnKey]<=invItem.weight,'Total berat retur melebihi berat jenis telur pada nota asal.');channel=i.channel;
     }
-    let loss=0;if(direction!=='customer')loss=takeFIFO(p,weight,ref).cost;
+    let loss=0,returnFifo=[];if(direction!=='customer'){const taken=takeFIFO(p,weight,ref);loss=taken.cost;returnFifo=taken.used;}
     const refund=positive(v.refund||0,'Nilai refund');
     if(resolution==='refund'){required(refund>0,'Masukkan nilai penggantian uang.');if(c)c.refundDue+=refund;}
     if(c&&resolution==='replace')c.eggDue+=weight;
@@ -115,7 +115,7 @@ export function replay(events){
     // Retur customer: telur sudah berkurang saat penjualan; jangan dikurangi lagi.
     // Refund customer mengurangi laba ketika hak refund dicatat, bukan saat uang dibayar.
     const recognized=direction==='customer'&&resolution==='refund'?-refund:-loss;
-    outcomes[e.id]={weight,recognized};add({...e,data:{...v,channel}},recognized,0,direction==='customer'?0:loss,direction==='customer'&&resolution==='refund'?refund:0);break;
+    outcomes[e.id]={weight,recognized,fifo:returnFifo};add({...e,data:{...v,channel}},recognized,0,direction==='customer'?0:loss,direction==='customer'&&resolution==='refund'?refund:0);break;
    }
    case 'settlement':{
     const amount=positive(v.amount||0,'Pembayaran/penggantian'),mode=v.mode,c=v.partyId?owner(v.partyId):null;
@@ -138,7 +138,7 @@ export function replay(events){
       required(v.productId===claim.productId,'Jenis telur pengganti harus sama dengan jenis telur yang diretur.');
       claim.eggDue-=qty;if(c)c.eggDue-=qty;
       if(claim.direction==='supplier'){const p=egg(v.productId);p.lots.push({source:e.id,sourceType:'settlement',sourcePurchaseId:'',qty,initialQty:qty,unit:0,totalCost:0});add(e,0);}
-      else {const cost=takeFIFO(egg(v.productId),qty,ref).cost;add({...e,data:{...v,channel:claim.channel}},-cost,0,cost);}
+      else {const taken=takeFIFO(egg(v.productId),qty,ref);outcomes[e.id]={fifo:taken.used,weight:qty,claimId:v.claimId};add({...e,data:{...v,channel:claim.channel}},-taken.cost,0,taken.cost);}
       break;
     }
     throw Error('Jenis penyelesaian tidak dikenali.');
@@ -148,9 +148,9 @@ export function replay(events){
     if(v.productId){
       const p=egg(v.productId),actual=positive(v.actual,'Stok fisik'),current=p.lots.reduce((a,l)=>a+l.qty,0),sourcePurchaseId=String(v.sourcePurchaseId||'');
       if(sourcePurchaseId){const src=eventById[sourcePurchaseId];required(src&&src.type==='purchase','Sumber kulak stok opname tidak ditemukan.');required(src.data?.productId===v.productId,'Sumber kulak tidak sesuai jenis telur.');required(processed.has(sourcePurchaseId),'Sumber kulak harus terjadi sebelum stok opname.');}
-      if(actual<current){const cost=takeFIFO(p,current-actual,ref).cost;add(e,-cost,0,cost);}
-      else if(actual>current){const adjUnit=positive(v.price||0,'Modal penyesuaian'),qty=actual-current;p.lots.push({source:e.id,sourceType:'adjust',sourcePurchaseId,qty,initialQty:qty,unit:adjUnit,totalCost:Math.round(qty*adjUnit/1000)});if(adjUnit>0)p.lastCost=adjUnit;add(e,0);}
-      else add(e,0);
+      if(actual<current){const qty=current-actual,taken=sourcePurchaseId?takeFIFO(p,qty,ref,l=>l.sourcePurchaseId===sourcePurchaseId):takeFIFO(p,qty,ref);outcomes[e.id]={fifo:taken.used,adjustQty:-qty,sourcePurchaseId};add(e,-taken.cost,0,taken.cost);}
+      else if(actual>current){const adjUnit=positive(v.price||0,'Modal penyesuaian'),qty=actual-current;p.lots.push({source:e.id,sourceType:'adjust',sourcePurchaseId,qty,initialQty:qty,unit:adjUnit,totalCost:Math.round(qty*adjUnit/1000)});if(adjUnit>0)p.lastCost=adjUnit;outcomes[e.id]={adjustQty:qty,sourcePurchaseId,adjustUnit:adjUnit};add(e,0);}
+      else {outcomes[e.id]={adjustQty:0,sourcePurchaseId};add(e,0);}
     }else{tray.available=positive(v.trayAvailable,'Tray layak');tray.broken=positive(v.trayBroken||0,'Tray rusak');tray.unitCost=positive(v.trayCost||0,'Modal tray');add(e,0);}break;
    }
    default:throw Error('Jenis transaksi belum didukung: '+e.type);
