@@ -311,7 +311,7 @@ function iconFor(b){const page=b.dataset.page;if(page)return {dashboard:'home',s
  return null;
 }
 function decorateIcons(){document.querySelectorAll('#app button,#modal button').forEach(b=>{
- if(b.dataset.cmIconized)return;const kind=iconFor(b);if(!kind)return;
+ if(b.dataset.cmIconized||b.classList.contains('lot-report-row'))return;const kind=iconFor(b);if(!kind)return;
  b.dataset.cmIconized='1';if(b.dataset.page){const old=b.querySelector('span');if(old){old.innerHTML=smallIcon(kind);old.classList.add('cm-nav-icon');}}else{
   const holder=document.createElement('span');holder.className='cm-button-icon';holder.innerHTML=smallIcon(kind);b.prepend(holder);b.classList.add('cm-with-icon');
  }

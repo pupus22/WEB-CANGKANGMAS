@@ -214,3 +214,38 @@
 .batch-section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0}.batch-section-head h3{margin:0}.batch-section-head small{color:var(--muted,#667085)}
 .lot-report-row .lot-channel small+ b{margin-top:3px}.lot-report-row .lot-channel b+small,.lot-report-row .lot-profit b+small{margin-top:3px;font-size:.7rem;color:var(--muted,#667085)}
 @media(max-width:760px){.lot-filter-grid,.supplier-product-grid{grid-template-columns:1fr}.supplier-channel-grid{grid-template-columns:1fr 1fr}.supplier-product-total span{font-size:.78rem}}
+
+/* Batch Kulak layout alignment fix - desktop/tablet/mobile */
+.lot-report-row{
+  grid-template-columns:minmax(0,1.35fr) minmax(115px,.72fr) minmax(115px,.72fr) minmax(0,1.05fr);
+  grid-template-areas:"main offline online profit";
+  column-gap:18px;
+  row-gap:8px;
+  padding:14px 18px;
+}
+.lot-report-row .lot-main{grid-area:main;text-align:left;min-width:0}
+.lot-report-row .lot-channel:nth-of-type(2){grid-area:offline}
+.lot-report-row .lot-channel:nth-of-type(3){grid-area:online}
+.lot-report-row .lot-profit{grid-area:profit}
+.lot-report-row .lot-channel,.lot-report-row .lot-profit{text-align:left;min-width:0}
+.lot-report-row .lot-main b,.lot-report-row .lot-main small,.lot-report-row .lot-channel small,.lot-report-row .lot-channel b,.lot-report-row .lot-profit small,.lot-report-row .lot-profit b{overflow-wrap:anywhere}
+@media(max-width:900px){
+  .lot-report-row{grid-template-columns:minmax(0,1.25fr) minmax(105px,.8fr) minmax(105px,.8fr);grid-template-areas:"main offline online" "profit profit profit"}
+  .lot-report-row .lot-profit{display:grid;grid-template-columns:auto auto;justify-content:space-between;gap:4px 14px;border-top:1px solid var(--line,#dfe5ef);padding-top:10px;margin-top:2px}
+  .lot-report-row .lot-profit small:last-child{grid-column:1/-1}
+}
+@media(max-width:640px){
+  .lot-report-list{gap:10px}
+  .lot-report-row{grid-template-columns:1fr 1fr;grid-template-areas:"main main" "offline online" "profit profit";gap:10px 12px;padding:13px 14px}
+  .lot-report-row .lot-main{padding-bottom:9px;border-bottom:1px solid var(--line,#dfe5ef)}
+  .lot-report-row .lot-main>b{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:.96rem}
+  .lot-report-row .lot-main small{font-size:.75rem}
+  .lot-report-row .lot-channel{background:var(--soft,#f5f7fb);border:1px solid var(--line,#dfe5ef);border-radius:10px;padding:9px 10px}
+  .lot-report-row .lot-channel b{font-size:.96rem}
+  .lot-report-row .lot-profit{display:block;margin-top:0;padding-top:10px;text-align:left}
+  .lot-report-row .lot-profit b{font-size:1.05rem;margin:2px 0 3px}
+  .lot-badge{margin-left:0}
+}
+@media(max-width:380px){
+  .lot-report-row{grid-template-columns:1fr;grid-template-areas:"main" "offline" "online" "profit"}
+}
