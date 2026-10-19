@@ -53,3 +53,6 @@ Karena verifikasi browser tidak tersedia, paket tidak dinyatakan lolos seluruh D
 Metadata HTML awal, OG, canonical, JSON-LD dan sitemap tetap dari sumber awal. Pengaturan admin mengubah title/description saat JavaScript berjalan. WhatsApp/OG dan sitemap statis tidak otomatis mengikuti perubahan harga/foto. Halaman lama dan detail produk tetap tersedia. Tidak dilakukan perubahan DNS, Search Console, Firebase Rules atau deployment ke cangkangmas.id.
 
 Upload foto tetap memakai Google Drive/OAuth yang sudah ada. Ketersediaan URL thumbnail bergantung pada layanan Google dan browser; perlu uji pengunjung setelah upload. Paket ini tidak menambahkan hosting gambar atau proses build otomatis untuk SEO.
+
+## Revisi produk HP, 19 Oktober 2026
+Atas permintaan pengguna, HORN dan OMEGA kini memakai dua kolom pada lebar di bawah 600px. Foto, font dan padding kartu dipadatkan; harga grosir/eceran ditumpuk di dalam masing-masing kartu. Target tombol minimal 44px. Halaman detail tunggal, tablet, desktop dan kode JS tidak berubah. Pemeriksaan kode/kontras/render yang tersedia lulus; pemeriksaan visual HP langsung masih belum tersedia.
