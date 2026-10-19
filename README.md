@@ -1,48 +1,54 @@
-# Cangkang Mas — Paket gabungan manajemen telur + website publik
+# Cangkang Mas: website publik satu halaman + manajemen
 
-**Sumber manajemen telur:** ZIP pengguna `cangkang-mas-invoice-sesuai-contoh(1).zip`. File inti `engine.mjs`, `receipt.js`, dan alur transaksi dipertahankan. Penambahan pada manajemen hanya tombol `Lainnya → Website Publik`, modul administrasi `website-public.js`, aturan Firestore publik, dan pengaturan antiindeks halaman internal.
+Paket 19 Oktober 2026. Dasar: CANGKANG-MAS-KULAK-MULTI-ITEM-FIFO(2).zip milik pengguna.
 
-## Struktur paket
+## Upload ke GitHub
 
-- `/` — Website publik (Beranda, Produk, Galeri, Profil, Kontak, tombol Login). Responsif untuk HP/tablet/laptop.
-- `/produk/horn/`, `/produk/omega/` — Halaman produk langsung, share link.
-- `/manajemen/` — Aplikasi manajemen telur Anda yang sebelumnya, ditambah `Lainnya → Website Publik`.
-- `firestore.rules` — Aturan gabungan untuk data internal privat dan konten website publik.
-- `sitemap.xml`, `robots.txt` — Persiapan SEO untuk domain rencana `cangkangmas.id`.
+1. Simpan salinan repository yang sedang digunakan.
+2. Ekstrak ZIP ini. Unggah seluruh ISINYA ke root repository yang sama. `index.html`, `public.js`, `public.css`, `public-assets.js`, `site-data.js`, `firebase-config.js`, `CNAME`, folder `assets`, dan folder `manajemen` harus sejajar. Jangan mengunggah ZIP sebagai satu berkas atau memasukkan folder pembungkus ke root.
+3. Pertahankan GitHub Pages dari branch dan direktori root yang sudah digunakan. `CNAME` tetap cangkangmas.id; tidak ada pengaturan DNS baru.
+4. Tunggu deployment GitHub Pages selesai, lalu lakukan hard refresh (Ctrl+F5 di laptop). Pada HP, muat ulang; bila cache lama masih terlihat, tutup tab dan buka kembali.
+5. Periksa Beranda, menu gulir, harga, foto, WhatsApp, galeri, peta dan Login. Masuk ke Kelola Website Publik, ubah satu teks yang memang ingin diganti, simpan, lalu muat ulang website. Uji upload gambar dari akun Anda sendiri sebelum mengganti banyak foto.
 
-## Deploy uji ke GitHub Pages (belum perlu beli domain)
+Paket ini tidak melakukan deploy otomatis, migrasi database, reset data atau penulisan Firebase saat diunggah. Jangan mengubah Firestore Rules yang aktif hanya untuk memasang redesign. Berkas konfigurasi/rules disertakan dari sumber awal tanpa perubahan.
 
-1. **Backup** repository dan ekspor backup data manajemen sebelum mengubah situs lama. ZIP aplikasi asal memperingatkan bahwa data lama pada struktur Firestore yang berbeda tidak dimigrasikan otomatis. Jangan mengganti aplikasi aktif bila belum yakin database Anda memakai struktur `users/{uid}/events` yang sesuai dengan ZIP ini.
-2. Buat repository GitHub baru untuk pengujian paket gabungan, misalnya `cangkangmas-gabungan-uji`. Upload **isi folder paket ini** ke root repo (bukan folder pembungkusnya). Jangan gunakan repository aplikasi aktif lebih dahulu.
-3. GitHub → Settings → Pages → Deploy from a branch → `main` → `/(root)` → Save. Alamat uji akan berbentuk `https://NAMA-AKUN.github.io/cangkangmas-gabungan-uji/`.
-4. Firebase Authentication → Settings → Authorized domains: tambahkan `NAMA-AKUN.github.io` bila belum ada. Pastikan email/password pengguna manajemen masih aktif.
-5. Firebase Firestore → Rules: **tinjau dan terapkan isi `firestore.rules` gabungan**. Rules ini mempertahankan pembatasan UID dari ZIP sumber dan menambahkan akses baca publik hanya ke `publicSite/config`, `publicSite/products/items/*`, `publicSite/gallery/items/*`. Jangan gunakan `allow read, write: if true`. Jika UID akun pemilik berubah, sesuaikan rules dengan UID terbaru **sebelum** digunakan, tanpa melonggarkan perlindungan.
-6. Buka URL uji → Login → aplikasi manajemen → Lainnya → Website Publik. Pada Produk & Harga, tekan **Buat Produk Awal HORN & OMEGA** bila belum ada, lalu isi harga publik dan foto. Atur kontak WhatsApp dengan tepat satu nomor utama yang aktif; lengkapi profil, SEO, galeri, dan Beranda. Data pemasaran publik terpisah dari transaksi, stok, harga kulak, bon, tray, FIFO, dan laporan.
-7. Uji login, siklus baca/tulis Firestore, menu admin, foto, WhatsApp, harga produk, nota, dan manajemen transaksi di lingkungan yang cocok dengan database Anda. **Jangan memindahkan ke repo aplikasi aktif sebelum pemeriksaan tersebut selesai.**
+## Mengelola website
 
-## Foto — Google Drive (revisi)
+Login pada footer menuju https://cangkangmas.id/manajemen/. Masuk seperti biasa, lalu Lainnya > Website Publik.
 
-Foto publik **tidak disimpan di Firestore atau GitHub**. Sesudah login Firebase, menu Website Publik dapat mengunggah foto dari HP ke Google Drive melalui OAuth Google dengan cakupan `drive.file`. Firestore menyimpan hanya URL foto; data nota tetap seperti sumber. Integrasi foto memerlukan konfigurasi OAuth Client ID dan persetujuan akses akun Google pemilik Drive. **Baca `GOOGLE-DRIVE-SETUP.md` sebelum mencoba upload.**
+- Beranda: teks kecil hero, judul utama, deskripsi, foto pembuka, judul dan pengantar bagian Produk, serta layanan.
+- Produk & Harga: nama, deskripsi, harga eceran/grosir, minimum grosir, status, visibilitas, urutan dan foto masing-masing produk. Judul katalog/pengantar katalog berlaku pada URL lama /produk/; judul bagian Produk pada halaman utama diatur di Beranda.
+- Galeri: foto, judul/keterangan, urutan, tampil/sembunyi dan titik fokus. Klik foto publik untuk memperbesar; Escape atau area luar menutup preview. Panah dan geser tetap tersedia.
+- Profil: judul, deskripsi, sorotan dan foto usaha.
+- Kontak: nama/nomor WhatsApp, nomor utama, alamat, wilayah, jam dan peta.
+- Logo & Footer: identitas, logo, label navigasi/tombol, slogan dan copyright.
+- SEO: pengaturan Beranda berlaku untuk halaman utama; pengaturan halaman lain tetap berlaku pada URL lama masing-masing. Detail produk mempertahankan URL lama.
 
-Foto Drive diberi izin `anyone: reader` agar pengunjung tanpa akun Google dapat melihatnya; jangan unggah dokumen privat. URL thumbnail Drive **tidak dijamin sebagai CDN/hosting gambar publik**: Google dapat membatasi atau mengubah perilakunya. Wajib uji foto pada browser samaran, HP, dan laptop; jika gagal, jangan nyatakan website produksi sudah siap. Hapus foto dari halaman hanya menghapus tautan, tidak menghapus file dari Drive. Berkas lama yang tertanam sebagai Base64 dari versi sebelumnya tidak otomatis dipindahkan.
+Setelah Simpan & Publikasikan, muat ulang halaman publik. Bukan pembaruan langsung tanpa reload. Harga publik terpisah dari transaksi, stok, HPP dan FIFO manajemen.
 
-## SEO: batas teknis GitHub Pages
+## Foto dan aset lokal
 
-`cangkangmas.id` **belum dibeli/aktif**. Sitemap, canonical URL, dan gambar pratinjau menggunakan domain rencana. Jangan daftarkan sitemap/domain di Search Console sampai domain aktif. GitHub Pages juga belum tentu tepat sebagai hosting produksi usaha komersial; periksa ketentuan hosting sebelum publikasi final.
+Foto yang sama dengan sumber awal memakai file lokal agar tetap cepat disajikan dan tersedia untuk perayapan. `public-assets.js` memasangkan sumber foto asli dengan file lokal dan ID produknya/galerinya. Mengubah urutan tidak mengganti pasangan foto.
 
-Teks SEO dapat diubah via Login → Manajemen Telur → Lainnya → Website Publik → Kelola SEO. Metadata HTML awal dan per halaman disiapkan dalam file statis, sedangkan perubahan SEO tersimpan di Firestore dan diterapkan saat JavaScript website berjalan. **GitHub Pages tidak melakukan rendering server.** Akibatnya, pembuat pratinjau WhatsApp/OG atau bot yang tidak menjalankan JavaScript mungkin tetap membaca judul/deskripsi/gambar statis sebelumnya. Sitemap statis hanya mencakup halaman bawaan dan tidak otomatis bertambah untuk produk baru. Agar seluruh metadata sosial dan sitemap mengikuti setiap edit admin tanpa upload kode, perlu langkah publikasi ulang otomatis atau hosting dengan rendering server. Hal ini belum diselesaikan oleh paket statis ini.
+Upload foto baru melalui admin memakai URL foto baru dari Google Drive yang disimpan di field lama. Menghapus foto dari admin mengosongkan foto publik, bukan menampilkan foto lokal lama kembali. Logo kosong menampilkan nama usaha. Hapus foto dari halaman tidak menghapus file Google Drive.
 
-## Kondisi awal dan keterbatasan
+Upload Drive tetap memerlukan konfigurasi OAuth yang sudah ada; lihat GOOGLE-DRIVE-SETUP.md. Browser dan layanan Google dapat membatasi penayangan thumbnail Drive. Upload/gambar baru perlu diuji pada browser pengunjung. Salinan lokal TIDAK otomatis dibuat untuk upload baru. Untuk mengganti foto lama secara manual, ganti file lokal dengan nama sama.
 
-- Harga sengaja **belum diisi**, bukan mengarang harga pasar. Foto Beranda, produk, dan galeri kosong sampai diunggah. Nomor WhatsApp, alamat, Maps, dan jam operasional harus diisi admin.
-- Nomor WA utama digunakan pada tombol umum dan produk; nomor aktif lain hanya ditampilkan di Kontak.
-- Tombol Login publik menuju `/manajemen/`, sehingga pengunjung tidak mendapat akses tanpa akun Firebase yang diizinkan rules.
-- SEO Google Search Console dan Profil Bisnis Google tidak didaftarkan/diedit oleh ZIP ini; perlu akses akun Google dan domain aktif.
-- Paket diuji secara statis dan unit test engine lokal; **belum teruji login langsung dengan akun Firebase, upload repo, browser HP/laptop, atau cetak fisik**.
+## Pengujian
 
+Dengan Node.js, jalankan dari root hasil ekstraksi:
 
-## Hotfix jalur Firestore (2026-09-25)
+```
+node manajemen/tests.mjs
+node tests/public/verify.cjs
+node tests/public/cms-titles.cjs
+node tests/public/public-final.cjs
+```
 
-Perbaikan error `Invalid collection reference ... publicSite/products has 2` dengan menggunakan koleksi valid `publicSite/products/items` dan `publicSite/gallery/items` untuk **seluruh operasi baca/tulis/hapus** di halaman publik dan pengelola. Dokumen `publicSite/config` tetap sama. Terapkan rules pada `firestore.rules` setelah membandingkannya dengan rules aktif. Jangan menghapus data manajemen.
+38 pengujian engine manajemen lulus. Pengujian publik mencakup render rute, aset, anchor, scrollspy, pengaturan teks, gambar baru/hapus, pengurutan galeri, modal, data kosong dan error offline menggunakan simulasi DOM. Log `simulated offline` pada pengujian terakhir adalah kasus kegagalan yang sengaja diuji.
 
-Saat mengunggah ke repository GitHub Pages, unggah **ISI ZIP ke root repository** (file `index.html` harus berada di root), bukan satu folder pembungkus. Pada repository GitHub Pages dengan alamat `username.github.io/nama-repo/`, navigasi/rute produk perlu diuji lagi sebelum dinyatakan final.
+Belum diuji langsung: login Firebase pemilik, simpan/upload Google Drive, tampilan nyata HP/laptop, dialog berbagi browser, WhatsApp dan cetak nota. Jangan menyamakan simulasi kode dengan pengujian browser lengkap. Hasil rinci ada pada AUDIT-FINAL.md.
+
+## Batas SEO yang tetap berlaku
+
+Canonical, URL lama, JSON-LD, robots dan sitemap sumber dipertahankan. Title/description dari admin diterapkan oleh JavaScript. Cuplikan WhatsApp/OG, metadata HTML awal dan sitemap tetap statis; tidak otomatis berubah setelah admin mengedit. Tidak ada klaim bahwa OG selalu mengikuti harga atau foto terbaru. Dokumen sumber historis disimpan di docs dan bukan petunjuk pemasangan paket ini.

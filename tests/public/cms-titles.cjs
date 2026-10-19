@@ -1,0 +1,11 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert'),path=require('path');
+const dist=fs.existsSync(path.resolve(__dirname,'../dist/public.js'))?path.resolve(__dirname,'../dist'):path.resolve(__dirname,'../..');const context=vm.createContext({URL,URLSearchParams,structuredClone,document:{getElementById:()=>({})},location:{pathname:'/',search:''}});
+for(const f of ['site-data.js','firebase-config.js','public-assets.js'])vm.runInContext(fs.readFileSync(dist+'/'+f,'utf8').replaceAll('export ',''),context);
+vm.runInContext(fs.readFileSync(dist+'/public.js','utf8').replace(/^import .*;\n/gm,'').replaceAll('import.meta.url',"'https://preview.test/public.js'").replace(/render\(\);load\(\);\s*$/,''),context);
+vm.runInContext('cfg.heroTitle="Judul Utama Baru <uji>";cfg.homeProductTitle="Judul Produk Baru";cfg.homeProductIntro="Pengantar Produk Baru";cfg.slogan="Slogan Footer Terpisah";cfg.productTitle="Judul Katalog Lama";cfg.productIntro="Pengantar Katalog Lama";',context);
+const home=vm.runInContext('home()',context),catalog=vm.runInContext('catalog()',context),footer=vm.runInContext('footer()',context);
+assert(home.includes('<h1>Judul Utama Baru &lt;uji&gt;</h1>'));
+assert(home.includes('<h2>Judul Produk Baru</h2>'));assert(home.includes('<p>Pengantar Produk Baru</p>'));
+assert(!home.includes('Judul Katalog Lama'));assert(catalog.includes('Judul Katalog Lama'));assert(catalog.includes('Pengantar Katalog Lama'));
+assert(footer.includes('Slogan Footer Terpisah'));assert(!home.includes('Slogan Footer Terpisah'));
+console.log('PASS: three CMS title fields render in the correct homepage positions, HTML escaped; legacy catalog fields and footer slogan remain independent. Simulated render only.');

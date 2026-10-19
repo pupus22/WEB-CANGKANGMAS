@@ -1,0 +1,290 @@
+[
+  {
+    "file": ".gitattributes",
+    "sha256_sumber": "1a1dbe176bc233b499d35a57db7513f2941c99ab9759f177830c9149be99005b",
+    "sha256_final": "1a1dbe176bc233b499d35a57db7513f2941c99ab9759f177830c9149be99005b",
+    "identik": true
+  },
+  {
+    "file": ".nojekyll",
+    "sha256_sumber": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "sha256_final": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "identik": true
+  },
+  {
+    "file": "404.html",
+    "sha256_sumber": "78c95f82a796f8bc44a0a4d6a9e344daa5c2fd80edecd4df1aaf7879856040de",
+    "sha256_final": "78c95f82a796f8bc44a0a4d6a9e344daa5c2fd80edecd4df1aaf7879856040de",
+    "identik": true
+  },
+  {
+    "file": "CNAME",
+    "sha256_sumber": "98e635b718d9a7d35e7ecfeffd6d76ed81f0cc3869c8baeaec14e16dd2a20f1c",
+    "sha256_final": "98e635b718d9a7d35e7ecfeffd6d76ed81f0cc3869c8baeaec14e16dd2a20f1c",
+    "identik": true
+  },
+  {
+    "file": "GAMBAR-LOKAL-SEO.md",
+    "sha256_sumber": "80da5c2b83e0a7408047d6c8e0556c88279bf419543019493a3a25969445bb33",
+    "sha256_final": null,
+    "identik": false
+  },
+  {
+    "file": "GOOGLE-DRIVE-SETUP.md",
+    "sha256_sumber": "dac25037bc3d1bd75d9548ad4d5b0ab0fba44dc0d115f96b3d31b607eb6ec30d",
+    "sha256_final": "dac25037bc3d1bd75d9548ad4d5b0ab0fba44dc0d115f96b3d31b607eb6ec30d",
+    "identik": true
+  },
+  {
+    "file": "README.md",
+    "sha256_sumber": "45d7b338666545d5e01818ab85bfdd0440ca33e792090cb2eec343fdf1aafe77",
+    "sha256_final": "bbb4aaa4d9b7796946f3510d50e13f1de56d7e22425cb24ca9e6f3f446c2242e",
+    "identik": false
+  },
+  {
+    "file": "assets/images/beranda.jpg",
+    "sha256_sumber": "72deb554a0664804437b909ee4e14b22684fce27f2e5eb0796f56a56b9c7d75d",
+    "sha256_final": "72deb554a0664804437b909ee4e14b22684fce27f2e5eb0796f56a56b9c7d75d",
+    "identik": true
+  },
+  {
+    "file": "assets/images/galeri-01.png",
+    "sha256_sumber": "868ee7dfa2c521710d43c7d064bfaccbe69a035f7550de7c1e60c9d1af8b0bf1",
+    "sha256_final": "868ee7dfa2c521710d43c7d064bfaccbe69a035f7550de7c1e60c9d1af8b0bf1",
+    "identik": true
+  },
+  {
+    "file": "assets/images/galeri-02.jpeg",
+    "sha256_sumber": "8eaa560aef7c6d0f51dd6f0a4a7381dfeec3edb36f3d9d3784d9d5a789df876f",
+    "sha256_final": "8eaa560aef7c6d0f51dd6f0a4a7381dfeec3edb36f3d9d3784d9d5a789df876f",
+    "identik": true
+  },
+  {
+    "file": "assets/images/galeri-03.jpeg",
+    "sha256_sumber": "78ce1c4a46c4e532b13c1bacea7624f6fd72f2f5b33e1005c92f10de3e4c4a15",
+    "sha256_final": "78ce1c4a46c4e532b13c1bacea7624f6fd72f2f5b33e1005c92f10de3e4c4a15",
+    "identik": true
+  },
+  {
+    "file": "assets/images/galeri-04.jpeg",
+    "sha256_sumber": "7f3e732f4ec1d3ff592fdeea83a83104ce05ab570d214a355dc2c4e54d20b9d1",
+    "sha256_final": "7f3e732f4ec1d3ff592fdeea83a83104ce05ab570d214a355dc2c4e54d20b9d1",
+    "identik": true
+  },
+  {
+    "file": "assets/images/galeri-05.jpeg",
+    "sha256_sumber": "518081730a89e66dee3f957c49e2d45b7e461743265b5e3731421346da8a6d3f",
+    "sha256_final": "518081730a89e66dee3f957c49e2d45b7e461743265b5e3731421346da8a6d3f",
+    "identik": true
+  },
+  {
+    "file": "assets/images/galeri-06.jpeg",
+    "sha256_sumber": "90dfbd8d81fe7169a2160106b468eaec3062b5d66251b672c2977229d5a44f3b",
+    "sha256_final": "90dfbd8d81fe7169a2160106b468eaec3062b5d66251b672c2977229d5a44f3b",
+    "identik": true
+  },
+  {
+    "file": "assets/images/horn.png",
+    "sha256_sumber": "ba976caa353ac56b12bd894984eae17bb440c11526615e02458df0482a9b76fe",
+    "sha256_final": "ba976caa353ac56b12bd894984eae17bb440c11526615e02458df0482a9b76fe",
+    "identik": true
+  },
+  {
+    "file": "assets/images/omega.png",
+    "sha256_sumber": "017a3faa6a5667c7eb34996a920200851810670b457eeeea3485e5ee6eca4d04",
+    "sha256_final": "017a3faa6a5667c7eb34996a920200851810670b457eeeea3485e5ee6eca4d04",
+    "identik": true
+  },
+  {
+    "file": "assets/images/profil.png",
+    "sha256_sumber": "2d698289ca40bd7d1417cdb0ffa1432f39c96e402e79a3e19ad8041823fa7d29",
+    "sha256_final": "2d698289ca40bd7d1417cdb0ffa1432f39c96e402e79a3e19ad8041823fa7d29",
+    "identik": true
+  },
+  {
+    "file": "assets/logo-header.png",
+    "sha256_sumber": "85e56a7bd0e189feb4f501eaf8ef7a90b6ee844d206c929ce459daa7a0aaefea",
+    "sha256_final": "85e56a7bd0e189feb4f501eaf8ef7a90b6ee844d206c929ce459daa7a0aaefea",
+    "identik": true
+  },
+  {
+    "file": "assets/logo.png",
+    "sha256_sumber": "95c864941dae26be026c1a2f32674f6ad3976288a96cb6f2ccbe61c4bd5d2a86",
+    "sha256_final": "95c864941dae26be026c1a2f32674f6ad3976288a96cb6f2ccbe61c4bd5d2a86",
+    "identik": true
+  },
+  {
+    "file": "assets/whatsapp.png",
+    "sha256_sumber": "c869dde21b27e9d470e7f6f0dabfac38c5a988a0e667e68109181086889e2b44",
+    "sha256_final": "c869dde21b27e9d470e7f6f0dabfac38c5a988a0e667e68109181086889e2b44",
+    "identik": true
+  },
+  {
+    "file": "firebase-config.js",
+    "sha256_sumber": "09d778f9d2c3d0f040b9360ffba75e204c95280c0b04fcfe594bba7c08a0131d",
+    "sha256_final": "09d778f9d2c3d0f040b9360ffba75e204c95280c0b04fcfe594bba7c08a0131d",
+    "identik": true
+  },
+  {
+    "file": "firestore.rules",
+    "sha256_sumber": "40befe55f0d8a70bcb4b9da7bf865aa8e4380a8cad88a3264bd82fa271102eb1",
+    "sha256_final": "40befe55f0d8a70bcb4b9da7bf865aa8e4380a8cad88a3264bd82fa271102eb1",
+    "identik": true
+  },
+  {
+    "file": "galeri/index.html",
+    "sha256_sumber": "16919ecc44b0844965e721f6d39c5b63cb5ea8e13bc430caaf5a3883cebe36e8",
+    "sha256_final": "16919ecc44b0844965e721f6d39c5b63cb5ea8e13bc430caaf5a3883cebe36e8",
+    "identik": true
+  },
+  {
+    "file": "index.html",
+    "sha256_sumber": "5f6a0becee07e25ef94b15434c16cd3b5aecc10823a57317d3ac8b0c77c8504e",
+    "sha256_final": "5f6a0becee07e25ef94b15434c16cd3b5aecc10823a57317d3ac8b0c77c8504e",
+    "identik": true
+  },
+  {
+    "file": "kontak/index.html",
+    "sha256_sumber": "b407663e1dc2a4e753a6ea94c8f86edbae87376b25f22b0c2c9db94d5668f412",
+    "sha256_final": "b407663e1dc2a4e753a6ea94c8f86edbae87376b25f22b0c2c9db94d5668f412",
+    "identik": true
+  },
+  {
+    "file": "manajemen/README.md",
+    "sha256_sumber": "bcc9ac2d6ca09bfc50039a8fbb07a446daf7fdaf7dc78bb2da47a08d1ee1dbc8",
+    "sha256_final": "bcc9ac2d6ca09bfc50039a8fbb07a446daf7fdaf7dc78bb2da47a08d1ee1dbc8",
+    "identik": true
+  },
+  {
+    "file": "manajemen/app.js",
+    "sha256_sumber": "e9ac53a74ec38a26c2e5f6e52ff1a515b10d0eb1742a895c1400c05708d047e5",
+    "sha256_final": "e9ac53a74ec38a26c2e5f6e52ff1a515b10d0eb1742a895c1400c05708d047e5",
+    "identik": true
+  },
+  {
+    "file": "manajemen/assets/logo.png",
+    "sha256_sumber": "95c864941dae26be026c1a2f32674f6ad3976288a96cb6f2ccbe61c4bd5d2a86",
+    "sha256_final": "95c864941dae26be026c1a2f32674f6ad3976288a96cb6f2ccbe61c4bd5d2a86",
+    "identik": true
+  },
+  {
+    "file": "manajemen/drive-config.js",
+    "sha256_sumber": "b0ad4630bfefedc3d085fddf6b7942e2e7583c20ea1691fc31556662ee1eedcc",
+    "sha256_final": "b0ad4630bfefedc3d085fddf6b7942e2e7583c20ea1691fc31556662ee1eedcc",
+    "identik": true
+  },
+  {
+    "file": "manajemen/drive-photo.js",
+    "sha256_sumber": "5372ea1d7549e75d6b62561c732c6a7241d0e456dd009a71bea31ef6f9a34617",
+    "sha256_final": "5372ea1d7549e75d6b62561c732c6a7241d0e456dd009a71bea31ef6f9a34617",
+    "identik": true
+  },
+  {
+    "file": "manajemen/engine.mjs",
+    "sha256_sumber": "a237d3cfc9d905537ab1299bdd18914c354d8c76f2e8e1f773b06b23fb2e0744",
+    "sha256_final": "a237d3cfc9d905537ab1299bdd18914c354d8c76f2e8e1f773b06b23fb2e0744",
+    "identik": true
+  },
+  {
+    "file": "manajemen/firebase-config.js",
+    "sha256_sumber": "09d778f9d2c3d0f040b9360ffba75e204c95280c0b04fcfe594bba7c08a0131d",
+    "sha256_final": "09d778f9d2c3d0f040b9360ffba75e204c95280c0b04fcfe594bba7c08a0131d",
+    "identik": true
+  },
+  {
+    "file": "manajemen/firestore.rules",
+    "sha256_sumber": "40befe55f0d8a70bcb4b9da7bf865aa8e4380a8cad88a3264bd82fa271102eb1",
+    "sha256_final": "40befe55f0d8a70bcb4b9da7bf865aa8e4380a8cad88a3264bd82fa271102eb1",
+    "identik": true
+  },
+  {
+    "file": "manajemen/index.html",
+    "sha256_sumber": "d4f054ffea22743c758d870ceec31c076c2f32c7fba001f4e4bb29fe21c8ba8b",
+    "sha256_final": "d4f054ffea22743c758d870ceec31c076c2f32c7fba001f4e4bb29fe21c8ba8b",
+    "identik": true
+  },
+  {
+    "file": "manajemen/receipt.js",
+    "sha256_sumber": "afe47579fa6047cf15503ca2d20cd3037e74949897c1e02727be8307dbedd55b",
+    "sha256_final": "afe47579fa6047cf15503ca2d20cd3037e74949897c1e02727be8307dbedd55b",
+    "identik": true
+  },
+  {
+    "file": "manajemen/style.css",
+    "sha256_sumber": "f618ad956bd73eeb72098ddb03b70c5744a8bfa3a99c5f6afbf5c0fce2d24da6",
+    "sha256_final": "f618ad956bd73eeb72098ddb03b70c5744a8bfa3a99c5f6afbf5c0fce2d24da6",
+    "identik": true
+  },
+  {
+    "file": "manajemen/tests.mjs",
+    "sha256_sumber": "559130b30449a010315f0f1b65f036628c8a82ebb57efe50895c39ea1bff30b6",
+    "sha256_final": "559130b30449a010315f0f1b65f036628c8a82ebb57efe50895c39ea1bff30b6",
+    "identik": true
+  },
+  {
+    "file": "manajemen/website-public.js",
+    "sha256_sumber": "dd88215c80e318c12f2eca8ab578154d502875e81d2405a6ed1318af573f52db",
+    "sha256_final": "a99f560168875ea6807ed103d6e2cb6b7e536cfe8fbe2fa9cca73d128afc03ae",
+    "identik": false
+  },
+  {
+    "file": "modify.py",
+    "sha256_sumber": "6fdea7a4556161ed93e38fa488623226c8b7b1833c84b2a92ab5c8efebe00d3c",
+    "sha256_final": null,
+    "identik": false
+  },
+  {
+    "file": "produk/horn/index.html",
+    "sha256_sumber": "d5f3900e15b020ce992b748adda9ce2a3d03062c05cbad10f87e04eaff7dd7d0",
+    "sha256_final": "d5f3900e15b020ce992b748adda9ce2a3d03062c05cbad10f87e04eaff7dd7d0",
+    "identik": true
+  },
+  {
+    "file": "produk/index.html",
+    "sha256_sumber": "c4dfc09adbd9a5d675270717684bf01e1f140fd40701ad5e47b195f823d7d4ba",
+    "sha256_final": "c4dfc09adbd9a5d675270717684bf01e1f140fd40701ad5e47b195f823d7d4ba",
+    "identik": true
+  },
+  {
+    "file": "produk/omega/index.html",
+    "sha256_sumber": "c71f167220b8bf7c55d097de72fdff50fea2f203b4f981150499917abee036e1",
+    "sha256_final": "c71f167220b8bf7c55d097de72fdff50fea2f203b4f981150499917abee036e1",
+    "identik": true
+  },
+  {
+    "file": "profil/index.html",
+    "sha256_sumber": "38f71ff48fe739f6b4bad8794fc45b118c829858ee98bf944e972c5e31f33f91",
+    "sha256_final": "38f71ff48fe739f6b4bad8794fc45b118c829858ee98bf944e972c5e31f33f91",
+    "identik": true
+  },
+  {
+    "file": "public.css",
+    "sha256_sumber": "8cf140fdf9f9fc5a3ba6764376d938ce0173835b48c4253ac1541c38067ad833",
+    "sha256_final": "91e750661783bdfb0c0b2da4f772a1e5291666ec57294e1644117b14f8e71479",
+    "identik": false
+  },
+  {
+    "file": "public.js",
+    "sha256_sumber": "0ce46f789729cc462806a6890c7dde614113a752af7182dbb1d253a5303566a9",
+    "sha256_final": "dc7c289d11dddbfcae86b72b0434b7142ae5fed1fee6dba2c7d3137715653a71",
+    "identik": false
+  },
+  {
+    "file": "robots.txt",
+    "sha256_sumber": "3be02fe35f74fd9565e0d4c8206b5668e2e35e1d7247c33d0c8ad13adb22d498",
+    "sha256_final": "3be02fe35f74fd9565e0d4c8206b5668e2e35e1d7247c33d0c8ad13adb22d498",
+    "identik": true
+  },
+  {
+    "file": "site-data.js",
+    "sha256_sumber": "51f83304ec69a4b1cadeb7367451d6d4abbc14b69497835c6742a9068ebd3a8c",
+    "sha256_final": "51f83304ec69a4b1cadeb7367451d6d4abbc14b69497835c6742a9068ebd3a8c",
+    "identik": true
+  },
+  {
+    "file": "sitemap.xml",
+    "sha256_sumber": "04c337cd57e39bda5a12c004dc7cc92a2296e087ca1187593a537b5c80bf6a9b",
+    "sha256_final": "04c337cd57e39bda5a12c004dc7cc92a2296e087ca1187593a537b5c80bf6a9b",
+    "identik": true
+  }
+]
