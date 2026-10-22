@@ -249,3 +249,10 @@
 @media(max-width:380px){
   .lot-report-row{grid-template-columns:1fr;grid-template-areas:"main" "offline" "online" "profit"}
 }
+.sale-history-filters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;padding-bottom:18px;border-bottom:1px solid #e2e8f0}
+.sale-history-filters .sale-search{grid-column:span 2}
+.sale-filter-actions{grid-column:span 2;display:flex;align-items:end;gap:8px;flex-wrap:wrap}
+.sale-filter-actions button{min-height:44px}
+.sale-filter-count{font-size:13px;padding:12px 0 4px;color:#38516d}
+@media(max-width:690px){.sale-history-filters{grid-template-columns:repeat(2,minmax(0,1fr))}.sale-filter-actions button{flex:1}.sale-history-filters input,.sale-history-filters select{min-height:44px;padding:10px}}
+@media(max-width:360px){.sale-history-filters{grid-template-columns:minmax(0,1fr)}.sale-history-filters .sale-search,.sale-filter-actions{grid-column:1}}

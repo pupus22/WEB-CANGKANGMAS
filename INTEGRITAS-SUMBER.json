@@ -158,8 +158,8 @@
   {
     "file": "manajemen/app.js",
     "sha256_sumber": "e9ac53a74ec38a26c2e5f6e52ff1a515b10d0eb1742a895c1400c05708d047e5",
-    "sha256_final": "e9ac53a74ec38a26c2e5f6e52ff1a515b10d0eb1742a895c1400c05708d047e5",
-    "identik": true
+    "sha256_final": "590229a394f280d3be44c6779371617fc678c2915feec71516e68f12d724fdf6",
+    "identik": false
   },
   {
     "file": "manajemen/assets/logo.png",
@@ -200,8 +200,8 @@
   {
     "file": "manajemen/index.html",
     "sha256_sumber": "d4f054ffea22743c758d870ceec31c076c2f32c7fba001f4e4bb29fe21c8ba8b",
-    "sha256_final": "d4f054ffea22743c758d870ceec31c076c2f32c7fba001f4e4bb29fe21c8ba8b",
-    "identik": true
+    "sha256_final": "b82816995ab6d90f7c7d487b60ce5cacdcd5fb7993ed2fec1f6ce96597508fb0",
+    "identik": false
   },
   {
     "file": "manajemen/receipt.js",
@@ -212,8 +212,8 @@
   {
     "file": "manajemen/style.css",
     "sha256_sumber": "f618ad956bd73eeb72098ddb03b70c5744a8bfa3a99c5f6afbf5c0fce2d24da6",
-    "sha256_final": "f618ad956bd73eeb72098ddb03b70c5744a8bfa3a99c5f6afbf5c0fce2d24da6",
-    "identik": true
+    "sha256_final": "fff4ef68e87a9254810469eba128226a91fed83c0b241364841162cbbaf875e7",
+    "identik": false
   },
   {
     "file": "manajemen/tests.mjs",

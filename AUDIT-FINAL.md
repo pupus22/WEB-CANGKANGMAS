@@ -15,7 +15,7 @@ Status: pemeriksaan kode dan pengujian simulasi selesai. Verifikasi browser sert
 
 ## Integritas sumber
 
-Berkas transaksi `manajemen/app.js`, `engine.mjs`, `receipt.js`, `style.css`, `index.html`, konfigurasi Firebase, Firestore Rules, drive config/photo, aset gambar asli, seluruh HTML publik/metadata, sitemap, robots dan CNAME dibandingkan byte demi byte dengan sumber awal dan identik. Pemeriksaan ini membuktikan berkas sama; tidak membuktikan semua layanan eksternal berfungsi.
+Pada rilis awal 19 Oktober, berkas manajemen selain petunjuk Website Publik identik dengan sumber awal. Revisi 22 Oktober mengubah `manajemen/app.js`, `style.css`, dan `index.html` untuk filter riwayat penjualan serta menambahkan modul filter dan pengujiannya. `engine.mjs`, `receipt.js`, konfigurasi Firebase, Firestore Rules, serta drive config/photo tetap identik dengan sumber awal. Lihat `INTEGRITAS-SUMBER.json` untuk hash terbaru. Kesamaan berkas tidak membuktikan semua layanan eksternal berfungsi.
 
 Berkas runtime lama yang berubah: `public.js`, `public.css`, serta satu paragraf `manajemen/website-public.js`. `public-assets.js` baru. README paket diperbarui. Dokumen historis README dan gambar dipindahkan ke docs agar petunjuk lama tidak dianggap petunjuk paket final. Script generator lama `modify.py` tidak disertakan karena tidak dipakai runtime dan menulis ulang UI lama. Berkas khusus Sites, token, hosting manifest dan snapshot runtime tidak masuk ZIP GitHub.
 
@@ -56,3 +56,13 @@ Upload foto tetap memakai Google Drive/OAuth yang sudah ada. Ketersediaan URL th
 
 ## Revisi produk HP, 19 Oktober 2026
 Atas permintaan pengguna, HORN dan OMEGA kini memakai dua kolom pada lebar di bawah 600px. Foto, font dan padding kartu dipadatkan; harga grosir/eceran ditumpuk di dalam masing-masing kartu. Target tombol minimal 44px. Halaman detail tunggal, tablet, desktop dan kode JS tidak berubah. Pemeriksaan kode/kontras/render yang tersedia lulus; pemeriksaan visual HP langsung masih belum tersedia.
+
+## Filter riwayat penjualan, 22 Oktober 2026
+
+- Pencarian customer, catatan/ID pesanan, ID transaksi dan nama produk. Beberapa kata dicocokkan bersamaan tanpa membedakan huruf besar/kecil.
+- Rentang tanggal inklusif, jenis telur dan kanal Offline/Shopee/Online dapat dikombinasikan. Transaksi lama satu produk dan transaksi multi-item didukung.
+- Klik Terapkan filter atau Enter pada pencarian. Reset mengembalikan seluruh riwayat. Tanggal akhir sebelum tanggal awal ditolak melalui validasi form.
+- Jumlah hasil, ukuran halaman, tombol awal/sebelumnya/berikutnya/akhir menggunakan daftar terfilter. Mengubah filter memulai kembali dari halaman pertama.
+- Pemilihan hanya dilakukan di memori browser; tidak ada penulisan database, perubahan transaksi, skema, perhitungan keuangan, ekspor laporan, atau API baru.
+- AntiSlop: label terlihat, kontrol native, fokus setelah Terapkan/Reset, target tombol minimal 44px, susunan dua kolom pada HP dengan pencarian selebar form. Pemeriksaan visual browser/perangkat langsung belum dilakukan.
+- Verifikasi: pengujian filter dan 38 pengujian engine lulus; sintaks app diperiksa. Firebase langsung belum diuji. Tidak dilakukan deployment ke cangkangmas.id.
