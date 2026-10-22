@@ -1,12 +1,14 @@
 import {firebaseConfig} from './firebase-config.js';
 import {defaults,waLink,safeUrl,money} from './site-data.js';
 import {bundledAssets} from './public-assets.js';
+import {pageSeo,applySeo} from './public-seo.mjs';
 const root=document.getElementById('public-root'),prefix=new URL('.',import.meta.url).pathname,href=(path='')=>prefix+path;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const maybeImage=s=>{if(typeof s!=='string')return '';if(s.startsWith(href('assets/'))&&/^[a-zA-Z0-9_./-]+$/.test(s)&&!s.includes('..'))return s;if(/^https:\/\/drive\.google\.com\/thumbnail\?id=[A-Za-z0-9_-]{10,}(&sz=w[0-9]{2,4})?$/.test(s))return s;return /^data:image\/(webp|jpeg|png);base64,[a-zA-Z0-9+/=]+$/.test(s)&&s.length<750000?s:''};
 // Keep crawlable local copies only while the configured image still matches that asset.
-function photoSource(value,key){const asset=bundledAssets[key];return asset&&value===asset.source?href(asset.file):maybeImage(value)}
-const image=(url,alt,cls='photo')=>url?`<img class="${cls}" alt="${esc(alt)}" loading="lazy" src="${esc(url)}">`:`<div role="img" aria-label="Foto ${esc(alt)} belum tersedia" class="${cls} placeholder">Foto belum tersedia</div>`;
+function photoSource(value,key){const asset=bundledAssets[key];return asset&&value===asset.source?href(asset.optimized||asset.file):maybeImage(value)}
+function imageDimensions(url){const asset=Object.values(bundledAssets).find(a=>url===href(a.optimized||a.file));return asset?.width&&asset?.height?` width="${asset.width}" height="${asset.height}"`:''}
+const image=(url,alt,cls='photo')=>url?`<img class="${cls}" alt="${esc(alt)}" loading="${cls==='brand-logo'?'eager':'lazy'}" decoding="async"${imageDimensions(url)} src="${esc(url)}">`:`<div role="img" aria-label="Foto ${esc(alt)} belum tersedia" class="${cls} placeholder">Foto belum tersedia</div>`;
 let cfg=structuredClone(defaults),products=[],gallery=[],page='beranda',productId='',primary=null,galleryVisible=6,loading=true,loadError='';
 const emptyContent=message=>`<p role="status">${esc(loading?'Memuat informasi terbaru…':loadError||message)}</p>`;
 const publicMeta=(p)=>cfg.seo?.[p]||defaults.seo[p]||defaults.seo.produk;
@@ -16,14 +18,14 @@ function primaryLink(item=''){if(!primary)return '';return waLink(primary.number
 function waIcon(){return `<img class="wa-icon" src="${href('assets/whatsapp.png')}" alt="" aria-hidden="true">`}
 function linkButton(label,url,css='btn btn-green'){const ico=url?.startsWith('https://wa.me/')?waIcon():'';return url?`<a class="${css}" href="${esc(url)}" ${url.startsWith('https://wa.me/')?'target="_blank" rel="noopener noreferrer"':''}>${ico}${esc(label)}</a>`:`<span class="${css}" aria-disabled="true" title="Nomor WhatsApp belum diisi">${esc(label)}</span>`}
 const sectionLink=key=>href()+'#'+key;
-function brandImage(cls){const logo=loading?href('assets/logo-header.png'):photoSource(cfg.logoImage,'logo');return logo?image(logo,'Logo '+cfg.name,cls):`<span class="brand-name">${esc(cfg.name)}</span>`}
+function brandImage(cls){const logo=cfg.logoImage?photoSource(cfg.logoImage,'logo'):loading?href('assets/logo-header.png'):'';return logo?image(logo,'Logo '+cfg.name,cls):`<span class="brand-name">${esc(cfg.name)}</span>`}
 function header(){const names=cfg.nav?.length===5?cfg.nav:defaults.nav;const keys=['beranda','produk','galeri','profil','kontak'];return `<header class="header"><div class="wrap head"><a class="brand" href="${sectionLink('beranda')}" aria-label="${esc(cfg.name)}, kembali ke Beranda">${brandImage('brand-logo')}${cfg.showHeaderSlogan?`<small class="brand-slogan">${esc(cfg.slogan)}</small>`:''}</a><nav class="nav" id="mainNav" aria-label="Navigasi utama">${names.map((n,i)=>`<a data-section="${keys[i]}" href="${sectionLink(keys[i])}" class="${page===keys[i]||page==='detail'&&i===1?'active':''}">${esc(n)}</a>`).join('')}</nav></div></header>`}
 function footer(){const n=cfg.nav?.length===5?cfg.nav:defaults.nav;return `<footer class="footer"><div class="wrap footer-layout"><div>${brandImage('footer-logo')}<p>${esc(cfg.slogan)}</p><p>${esc(cfg.region)}</p></div><div><nav aria-label="Navigasi footer">${n.map((v,i)=>`<a href="${sectionLink(['beranda','produk','galeri','profil','kontak'][i])}">${esc(v)}</a>`).join('')}<a class="footer-login" href="https://cangkangmas.id/manajemen/">${esc(cfg.loginLabel||'Login')}</a></nav><p>${esc(cfg.copyright)}</p></div></div></footer>`}
 function card(p,compact=false){
  const out=p.status==='out',l=primaryLink(p.name),productUrl=urlProduct(p);
  return `<article class="card${compact?' compact-card':''}">
  ${image(photoSource(p.image,'product:'+p.id),p.name)}
- <div class="card-body"><div class="card-main"><div class="card-heading"><${page==='detail'?'h1':'h3'}>${esc(p.name)}</${page==='detail'?'h1':'h3'}>${compact?'':`<span class="badge ${out?'out':''}">${out?'Habis':'Tersedia'}</span>`}</div><p class="card-description">${esc(p.description)}</p></div>
+ <div class="card-body"><div class="card-main"><div class="card-heading"><${page==='detail'?'h1':'h3'}>${esc(p.name)}</${page==='detail'?'h1':'h3'}>${compact?'':`<span class="badge ${out?'out':''}">${loading||loadError?'Konfirmasi stok':out?'Habis':'Tersedia'}</span>`}</div><p class="card-description">${esc(p.description)}</p></div>
  ${compact?`<a class="btn btn-dark card-cta" href="${productUrl}">Lihat Detail →</a>`:
  `<div class="prices"><div class="price wholesale"><small>HARGA GROSIR</small><strong>${money(p.wholesale)}</strong><small>per kg</small></div><div class="price retail"><small>HARGA ECERAN</small><strong>${money(p.retail)}</strong><small>per kg</small></div></div>
  ${p.showMin&&p.minWholesale?`<p class="muted">Minimum grosir: ${esc(p.minWholesale)} kg</p>`:''}
@@ -33,7 +35,7 @@ function card(p,compact=false){
 }
 function home(){
  const heroPhoto=photoSource(cfg.heroImage,'hero');
- return `<main><section id="beranda" class="immersive-hero">${heroPhoto?`<img class="immersive-photo" src="${esc(heroPhoto)}" alt="Telur asli ${esc(cfg.name)} siap angkut" fetchpriority="high">`:''}<div class="immersive-content wrap"><p class="hero-region">${esc(cfg.heroEyebrow)}</p><h1>${esc(cfg.heroTitle)}</h1><p class="hero-description">${esc(cfg.heroText)}</p><div class="buttons"><a class="btn btn-white" href="${sectionLink('produk')}">${esc(cfg.buttons?.products||'Lihat Produk')}</a>${linkButton(cfg.buttons?.whatsapp||'Hubungi WhatsApp',primaryLink(),'btn btn-ghost')}</div></div></section>
+ return `<main><section id="beranda" class="immersive-hero">${heroPhoto?`<img class="immersive-photo" src="${esc(heroPhoto)}" alt="Telur asli ${esc(cfg.name)} siap angkut" fetchpriority="high" decoding="async"${imageDimensions(heroPhoto)}>`:''}<div class="immersive-content wrap"><p class="hero-region">${esc(cfg.heroEyebrow)}</p><h1>${esc(cfg.heroTitle)}</h1><p class="hero-description">${esc(cfg.heroText)}</p><div class="buttons"><a class="btn btn-white" href="${sectionLink('produk')}">${esc(cfg.buttons?.products||'Lihat Produk')}</a>${linkButton(cfg.buttons?.whatsapp||'Hubungi WhatsApp',primaryLink(),'btn btn-ghost')}</div></div></section>
  <section id="produk" class="section wrap products-section"><div class="section-heading"><div><span class="overline">Pilihan produk</span><h2>${esc(cfg.homeProductTitle)}</h2></div><p>${esc(cfg.homeProductIntro)}</p></div><div class="grid">${products.filter(p=>p.visible!==false).map(p=>card(p)).join('')||emptyContent('Belum ada produk yang ditampilkan.')}</div><p class="muted product-note">${esc(cfg.productNote)}</p></section>
  ${galleryPage(true)}
  ${profilePage(true)}
@@ -54,7 +56,11 @@ function contactPage(embedded=false){
  const all=(cfg.contacts||[]).filter(c=>c.active!==false&&c.number),sorted=[...all].sort((a,b)=>Number(!!b.primary)-Number(!!a.primary)),embed=locationEmbed();
  return `<${embedded?'section id="kontak"':'main'} class="contact-page"><section class="contact-hero"><div class="wrap"><span class="eyebrow">KONTAK CANGKANG MAS</span><${embedded?'h2':'h1'}>${esc(cfg.contactTitle)}</${embedded?'h2':'h1'}><p>${esc(cfg.contactIntro)}</p></div></section><div class="contact-area"><div class="wrap"><div class="contact-list">${sorted.map(c=>`<article class="contact-card ${c.primary?'contact-primary':'contact-secondary'}"><div class="contact-card-top"><div class="contact-icon">${waIcon()}</div><span class="contact-role">${c.primary?'Kontak utama':'Kontak alternatif'}</span></div><div class="contact-main"><h3>${esc(c.name)}</h3><p>Informasi produk, harga, stok, dan pemesanan melalui WhatsApp.</p>${linkButton('Chat WhatsApp',waLink(c.number,`Halo ${cfg.name}, saya ingin menanyakan informasi telur.`))}</div></article>`).join('')||'<p>Nomor WhatsApp belum tersedia.</p>'}</div><section class="location-card"><div class="location-head"><${embedded?'h3':'h2'}>${esc(cfg.locationTitle)}</${embedded?'h3':'h2'}><p>Informasi lokasi dan layanan Cangkang Mas.</p></div><div class="location-details"><div class="location-detail"><span aria-hidden="true">⌖</span><div><b>Lokasi Usaha</b><p>${esc(cfg.address||'Alamat belum dicantumkan.')}</p></div></div><div class="location-detail"><span aria-hidden="true">◎</span><div><b>Wilayah Layanan</b><p>${esc(cfg.region)}</p></div></div><div class="location-detail"><span aria-hidden="true">◷</span><div><b>Jam Operasional</b><p>${esc(cfg.hours||'Hubungi kami untuk informasi jam operasional.')}</p></div></div></div>${embed?`<iframe class="map" title="Peta lokasi Cangkang Mas" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="${esc(embed)}"></iframe>`:'<div class="notice">Isi alamat lengkap atau URL embed Google Maps melalui pengaturan Kontak agar pratinjau peta muncul di sini.</div>'}</section></div></div></${embedded?'section':'main'}>`;
 }
-function updateSeo(){const k=page==='detail'?'produk':page,m=publicMeta(k);if(page!=='detail'){document.title=m.title||document.title;document.querySelector('meta[name="description"]')?.setAttribute('content',m.description||'')}if(m.index===false){let n=document.querySelector('meta[name="robots"]');if(!n){n=document.createElement('meta');n.name='robots';document.head.append(n)}n.content='noindex,follow'}}
+function updateSeo(){
+ if(!document.head)return;
+ const missing=page==='detail'&&!loading&&!loadError&&!products.some(p=>p.id===productId&&p.visible!==false);
+ applySeo(document,pageSeo({config:cfg,products,page,productId,imageSource:photoSource,live:!loading&&!loadError,missing}));
+}
 let cleanupSectionNav=()=>{},jumpToInitialHash=true,closeActiveGallery=null;
 function setupSectionNav(){
  if(page!=='beranda')return;
@@ -96,4 +102,10 @@ function applyPublicData(configSnap,prodSnap,gallerySnap){
 }
 async function fetchPublicData(){const [{initializeApp},{getFirestore,doc,getDoc,collection,getDocs}]=await Promise.all([import('https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js'),import('https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js')]);const db=getFirestore(initializeApp(firebaseConfig));return Promise.all([getDoc(doc(db,'publicSite','config')),getDocs(collection(db,'publicSite','products','items')),getDocs(collection(db,'publicSite','gallery','items'))])}
 async function load(){let timer;try{const result=await Promise.race([fetchPublicData(),new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error('Waktu memuat konten habis.')),25000)})]);applyPublicData(...result)}catch(err){loadError='Harga dan kontak terbaru belum dapat dimuat. Periksa koneksi lalu muat ulang halaman.';console.warn('Konten publik belum dapat disinkronkan:',err)}finally{clearTimeout(timer);loading=false;render()}}
+function readInitialContent(){
+ const node=document.getElementById('public-content');
+ if(!node?.textContent)return;
+ try{const data=JSON.parse(node.textContent);applyPublicData({exists:()=>true,data:()=>data.config},{docs:data.products.map(p=>({id:p.id,data:()=>({...p,retail:null,wholesale:null,status:''})}))},{docs:data.gallery.map(g=>({id:g.id,data:()=>g}))})}catch(err){console.warn('Konten awal tidak dapat dibaca:',err)}
+}
+readInitialContent();
 render();load();

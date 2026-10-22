@@ -1,16 +1,16 @@
 # Cangkang Mas: website publik satu halaman + manajemen
 
-Paket 19 Oktober 2026. Dasar: CANGKANG-MAS-KULAK-MULTI-ITEM-FIFO(2).zip milik pengguna.
+Revisi SEO 22 Oktober 2026. Dasar: paket final GitHub versi 2, dengan sistem manajemen yang sama. Baca SEO-SETUP.md untuk aktivasi publikasi SEO otomatis dan AUDIT-SEO-2026-10-22.md untuk hasil pengujian terbaru.
 
 ## Upload ke GitHub
 
 1. Simpan salinan repository yang sedang digunakan.
 2. Ekstrak ZIP ini. Unggah seluruh ISINYA ke root repository yang sama. `index.html`, `public.js`, `public.css`, `public-assets.js`, `site-data.js`, `firebase-config.js`, `CNAME`, folder `assets`, dan folder `manajemen` harus sejajar. Jangan mengunggah ZIP sebagai satu berkas atau memasukkan folder pembungkus ke root.
-3. Pertahankan GitHub Pages dari branch dan direktori root yang sudah digunakan. `CNAME` tetap cangkangmas.id; tidak ada pengaturan DNS baru.
+3. Untuk pembaruan SEO otomatis, pilih Settings > Pages > Source > GitHub Actions. Sertakan `.github/workflows/publish-seo.yml` dan folder `scripts`, lalu jalankan workflow. `CNAME` tetap cangkangmas.id; tidak ada pengaturan DNS baru. Langkah lengkap ada di SEO-SETUP.md.
 4. Tunggu deployment GitHub Pages selesai, lalu lakukan hard refresh (Ctrl+F5 di laptop). Pada HP, muat ulang; bila cache lama masih terlihat, tutup tab dan buka kembali.
 5. Periksa Beranda, menu gulir, harga, foto, WhatsApp, galeri, peta dan Login. Masuk ke Kelola Website Publik, ubah satu teks yang memang ingin diganti, simpan, lalu muat ulang website. Uji upload gambar dari akun Anda sendiri sebelum mengganti banyak foto.
 
-Paket ini tidak melakukan deploy otomatis, migrasi database, reset data atau penulisan Firebase saat diunggah. Jangan mengubah Firestore Rules yang aktif hanya untuk memasang redesign. Berkas konfigurasi/rules disertakan dari sumber awal tanpa perubahan.
+Paket menyertakan workflow publikasi GitHub Pages. Setelah diaktifkan, workflow membangun dari data publik dan menerbitkan website. Tidak ada migrasi database, reset data, atau penulisan Firebase oleh proses build. Berkas konfigurasi/rules disertakan dari sumber awal tanpa perubahan.
 
 ## Mengelola website
 
@@ -47,8 +47,8 @@ node tests/public/public-final.cjs
 
 38 pengujian engine manajemen lulus. Pengujian publik mencakup render rute, aset, anchor, scrollspy, pengaturan teks, gambar baru/hapus, pengurutan galeri, modal, data kosong dan error offline menggunakan simulasi DOM. Log `simulated offline` pada pengujian terakhir adalah kasus kegagalan yang sengaja diuji.
 
-Belum diuji langsung: login Firebase pemilik, simpan/upload Google Drive, tampilan nyata HP/laptop, dialog berbagi browser, WhatsApp dan cetak nota. Jangan menyamakan simulasi kode dengan pengujian browser lengkap. Hasil rinci ada pada AUDIT-FINAL.md.
+Revisi SEO juga diuji di Chromium pada lebar 360/412/768/1366 px dengan Firebase tiruan, termasuk form SEO, navigasi, galeri, salin tautan, dan kegagalan data. Belum diuji langsung: login Firebase pemilik, upload Google Drive, perangkat fisik, dialog berbagi native, pengiriman WhatsApp, cetak nota, dan deployment repository pengguna. Hasil terbaru ada pada AUDIT-SEO-2026-10-22.md; AUDIT-FINAL.md adalah audit historis paket sebelumnya.
 
 ## Batas SEO yang tetap berlaku
 
-Canonical, URL lama, JSON-LD, robots dan sitemap sumber dipertahankan. Title/description dari admin diterapkan oleh JavaScript. Cuplikan WhatsApp/OG, metadata HTML awal dan sitemap tetap statis; tidak otomatis berubah setelah admin mengedit. Tidak ada klaim bahwa OG selalu mengikuti harga atau foto terbaru. Dokumen sumber historis disimpan di docs dan bukan petunjuk pemasangan paket ini.
+URL lama dipertahankan. Metadata browser mengikuti data terbaru ketika halaman dimuat. HTML awal, foto OG, JSON-LD, dan sitemap diperbarui oleh workflow berkala setelah aktivasi. Jadwal 15 menit dapat terlambat; cache Google/WhatsApp dapat menunda perubahan cuplikan. Harga tidak ditanam di snapshot statis. Panduan lengkap dan batas dukungan halaman produk tambahan ada di SEO-SETUP.md. Dokumen dalam docs adalah sumber historis.

@@ -11,7 +11,7 @@ assert.equal(run('products.length'),0);assert.equal(run('gallery.length'),0);run
 const fake=()=>run('applyPublicData({exists:()=>true,data:()=>snapshot.config},{docs:snapshot.products.map(p=>({id:p.id,data:()=>p}))},{docs:snapshot.gallery.map(g=>({id:g.id,data:()=>g}))});loading=false');
 fake();
 for(const [key,field]of [['hero','heroImage'],['profile','profileImage'],['logo','logoImage']]){
- assert.equal(run(`photoSource(cfg.${field},'${key}')`),'/'+run(`bundledAssets['${key}'].file`));
+ assert.equal(run(`photoSource(cfg.${field},'${key}')`),'/'+run(`bundledAssets['${key}'].optimized||bundledAssets['${key}'].file`));
  run(`cfg.${field}='https://drive.google.com/thumbnail?id=NEW_IMAGE_MARKER01&sz=w1600'`);
  assert(run(key==='hero'?'home()':key==='profile'?'profilePage()':'header()').includes('NEW_IMAGE_MARKER01'));
  run(`cfg.${field}=''`);assert.equal(run(`photoSource(cfg.${field},'${key}')`),'');
