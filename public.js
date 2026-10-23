@@ -1,5 +1,5 @@
 import {firebaseConfig} from './firebase-config.js';
-import {defaults,waLink,safeUrl,money} from './site-data.js';
+import {defaults,waLink,safeUrl,money,improvePublicCopy,improveProductCopy} from './site-data.js';
 import {bundledAssets} from './public-assets.js';
 import {pageSeo,applySeo} from './public-seo.mjs';
 const root=document.getElementById('public-root'),prefix=new URL('.',import.meta.url).pathname,href=(path='')=>prefix+path;
@@ -14,10 +14,10 @@ const emptyContent=message=>`<p role="status">${esc(loading?'Memuat informasi te
 const publicMeta=(p)=>cfg.seo?.[p]||defaults.seo[p]||defaults.seo.produk;
 function pathPage(){const p=location.pathname.substring(prefix.length).replace(/^\/+|\/+$/g,'').split('/').filter(Boolean);if(p[0]==='produk'&&p[1]){page='detail';productId=p[1];}else if(['produk','galeri','profil','kontak'].includes(p[0]))page=p[0];else page='beranda';if(page==='produk'&&new URLSearchParams(location.search).has('item')){page='detail';productId=new URLSearchParams(location.search).get('item')||''}}
 function urlProduct(p){return ['horn','omega'].includes(p.id)?href('produk/'+p.id+'/'):href('produk/?item='+encodeURIComponent(p.id))}
-function primaryLink(item=''){if(!primary)return '';return waLink(primary.number,`Halo ${cfg.name}, saya ingin menanyakan informasi${item?' '+item:''}.`)}
+function primaryLink(item=''){if(!primary)return '';return waLink(primary.number,`Halo ${cfg.name}, saya ingin memesan${item?' '+item:' telur'}.\nJumlah kebutuhan: \nLokasi tujuan: \nMohon informasi harga, stok, dan ongkir.`)}
 function waIcon(){return `<img class="wa-icon" src="${href('assets/whatsapp.png')}" alt="" aria-hidden="true">`}
 function linkButton(label,url,css='btn btn-green'){const ico=url?.startsWith('https://wa.me/')?waIcon():'';return url?`<a class="${css}" href="${esc(url)}" ${url.startsWith('https://wa.me/')?'target="_blank" rel="noopener noreferrer"':''}>${ico}${esc(label)}</a>`:`<span class="${css}" aria-disabled="true" title="Nomor WhatsApp belum diisi">${esc(label)}</span>`}
-const sectionLink=key=>href()+'#'+key;
+const sectionLink=key=>page==='beranda'?href()+'#'+key:href(key==='beranda'?'':key+'/');
 function brandImage(cls){const logo=cfg.logoImage?photoSource(cfg.logoImage,'logo'):loading?href('assets/logo-header.png'):'';return logo?image(logo,'Logo '+cfg.name,cls):`<span class="brand-name">${esc(cfg.name)}</span>`}
 function header(){const names=cfg.nav?.length===5?cfg.nav:defaults.nav;const keys=['beranda','produk','galeri','profil','kontak'];return `<header class="header"><div class="wrap head"><a class="brand" href="${sectionLink('beranda')}" aria-label="${esc(cfg.name)}, kembali ke Beranda">${brandImage('brand-logo')}${cfg.showHeaderSlogan?`<small class="brand-slogan">${esc(cfg.slogan)}</small>`:''}</a><nav class="nav" id="mainNav" aria-label="Navigasi utama">${names.map((n,i)=>`<a data-section="${keys[i]}" href="${sectionLink(keys[i])}" class="${page===keys[i]||page==='detail'&&i===1?'active':''}">${esc(n)}</a>`).join('')}</nav></div></header>`}
 function footer(){const n=cfg.nav?.length===5?cfg.nav:defaults.nav;return `<footer class="footer"><div class="wrap footer-layout"><div>${brandImage('footer-logo')}<p>${esc(cfg.slogan)}</p><p>${esc(cfg.region)}</p></div><div><nav aria-label="Navigasi footer">${n.map((v,i)=>`<a href="${sectionLink(['beranda','produk','galeri','profil','kontak'][i])}">${esc(v)}</a>`).join('')}<a class="footer-login" href="https://cangkangmas.id/manajemen/">${esc(cfg.loginLabel||'Login')}</a></nav><p>${esc(cfg.copyright)}</p></div></div></footer>`}
@@ -30,7 +30,7 @@ function card(p,compact=false){
  `<div class="prices"><div class="price wholesale"><small>HARGA GROSIR</small><strong>${money(p.wholesale)}</strong><small>per kg</small></div><div class="price retail"><small>HARGA ECERAN</small><strong>${money(p.retail)}</strong><small>per kg</small></div></div>
  ${p.showMin&&p.minWholesale?`<p class="muted">Minimum grosir: ${esc(p.minWholesale)} kg</p>`:''}
  ${out?'<p class="notice">Stok sedang tidak tersedia. Hubungi kami untuk menanyakan ketersediaan.</p>':''}
- <div class="buttons card-actions">${linkButton(out?'Tanya Ketersediaan':(cfg.buttons?.productAsk||'Tanya')+' '+p.name,l)}<a class="btn btn-light share" href="${productUrl}" data-share="${esc(productUrl)}" aria-label="Bagikan ${esc(p.name)}">↗ ${esc(cfg.buttons?.share||'Bagikan')}</a></div><a class="product-detail-link" href="${productUrl}">Lihat detail ${esc(p.name)} →</a>`}
+ <div class="buttons card-actions">${linkButton(out?'Tanya Ketersediaan':(cfg.buttons?.productAsk||'Tanya')+' '+p.name,l)}<a class="btn btn-light share" href="${productUrl}" data-share="${esc(productUrl)}" aria-label="Bagikan ${esc(p.name)}">↗ ${esc(cfg.buttons?.share||'Bagikan')}</a></div>${page==='detail'?'':`<a class="product-detail-link" href="${productUrl}">Lihat detail ${esc(p.name)} →</a>`}`}
  </div></article>`;
 }
 function home(){
@@ -40,10 +40,11 @@ function home(){
  ${galleryPage(true)}
  ${profilePage(true)}
  <section class="section wrap services-section"><div class="service-copy"><span class="overline">Eceran &amp; grosir</span><h2>${esc(cfg.serviceTitle)}</h2><div class="service-list">${(cfg.services||[]).map(item=>`<div class="service"><h3>${esc(item.title)}</h3><p>${esc(item.text)}</p></div>`).join('')}</div></div></section>
- ${contactPage(true)}</main>`;
+ ${buyingGuide()}${contactPage(true)}</main>`;
 }
-function catalog(){return `<main class="section wrap"><div class="intro"><span class="overline">KATALOG PRODUK</span><h1>${esc(cfg.productTitle)}</h1><p>${esc(cfg.productIntro)}</p></div><div class="grid">${products.filter(p=>p.visible!==false).map(p=>card(p)).join('')||emptyContent('Belum ada produk yang ditampilkan.')}</div><p class="notice" style="margin-top:22px">${esc(cfg.productNote)}</p></main>`}
-function detail(){const p=products.find(p=>p.id===productId&&p.visible!==false);if(!p){if(!loading&&!loadError)document.title='Produk tidak ditemukan | Cangkang Mas';return `<main class="section wrap"><h1>${loading?'Memuat produk':loadError?'Informasi produk belum tersedia':'Produk tidak ditemukan'}</h1>${emptyContent('Produk ini tidak tersedia.')}<a href="${href('produk/')}">Kembali ke katalog</a></main>`;}document.title=p.seoTitle||p.name+' | Cangkang Mas';document.querySelector('meta[name="description"]')?.setAttribute('content',p.seoDescription||p.description);return `<main class="section wrap"><div class="detail"><a href="${href('produk/')}">← Kembali ke Produk</a><div style="margin-top:15px">${card(p)}</div></div></main>`}
+function buyingGuide(){return `<section class="section wrap buying-guide"><h2>${esc(cfg.orderTitle)}</h2><p>${esc(cfg.orderText)}</p><p>${linkButton('Tanya Pesanan via WhatsApp',primaryLink())} <a class="btn btn-light" href="${href('produk/')}">Katalog & Harga Telur</a></p><h2>${esc(cfg.faqTitle)}</h2>${(cfg.faqs||[]).filter(f=>f.question&&f.answer).map(f=>`<details><summary>${esc(f.question)}</summary><p>${esc(f.answer)}</p></details>`).join('')}</section>`}
+function catalog(){return `<main class="section wrap"><div class="intro"><span class="overline">KATALOG PRODUK</span><h1>${esc(cfg.productTitle)}</h1><p>${esc(cfg.productIntro)}</p></div><div class="grid">${products.filter(p=>p.visible!==false).map(p=>card(p)).join('')||emptyContent('Belum ada produk yang ditampilkan.')}</div><p class="notice" style="margin-top:22px">${esc(cfg.productNote)}</p>${buyingGuide()}</main>`}
+function detail(){const p=products.find(p=>p.id===productId&&p.visible!==false);if(!p){if(!loading&&!loadError)document.title='Produk tidak ditemukan | Cangkang Mas';return `<main class="section wrap"><h1>${loading?'Memuat produk':loadError?'Informasi produk belum tersedia':'Produk tidak ditemukan'}</h1>${emptyContent('Produk ini tidak tersedia.')}<a href="${href('produk/')}">Kembali ke katalog</a></main>`;}document.title=p.seoTitle||p.name+' | Cangkang Mas';document.querySelector('meta[name="description"]')?.setAttribute('content',p.seoDescription||p.description);return `<main class="section wrap"><div class="detail"><a href="${href('produk/')}">← Kembali ke Produk</a><div style="margin-top:15px">${card(p)}</div><section class="product-help"><h2>Pemesanan ${esc(p.name)}</h2><p>${esc(p.orderInfo||cfg.orderText)}</p>${p.showMin&&p.minWholesale?`<p>Minimum pembelian grosir: ${esc(p.minWholesale)} kg.</p>`:'<p>Tanyakan ketentuan pembelian grosir melalui WhatsApp.</p>'}<p>${esc(cfg.productNote)}</p><a href="${href('kontak/')}">Lihat kontak dan lokasi usaha</a></section><nav aria-label="Produk lainnya">${products.filter(x=>x.visible!==false&&x.id!==p.id).map(x=>`<a class="btn btn-light" href="${urlProduct(x)}">Lihat ${esc(x.name)}</a>`).join('')}</nav></div>${buyingGuide()}</main>`}
 function visibleGallery(){return gallery.filter(x=>x.visible!==false)}
 function galleryPage(embedded=false){
  const items=visibleGallery();
@@ -97,7 +98,8 @@ function openGallery(index){const selected=visibleGallery()[index];const items=v
 function applyPublicData(configSnap,prodSnap,gallerySnap){
  const data=configSnap.exists()?configSnap.data():{};
  cfg={...structuredClone(defaults),...data,seo:{...defaults.seo,...data.seo},buttons:{...defaults.buttons,...data.buttons}};
- products=prodSnap.docs.map(d=>({...d.data(),id:d.id})).sort((a,b)=>(a.position||0)-(b.position||0));
+ cfg=improvePublicCopy(cfg);
+ products=prodSnap.docs.map(d=>improveProductCopy({...d.data(),id:d.id})).sort((a,b)=>(a.position||0)-(b.position||0));
  gallery=gallerySnap.docs.map(d=>({...d.data(),id:d.id})).sort((a,b)=>(a.position||0)-(b.position||0));
 }
 async function fetchPublicData(){const [{initializeApp},{getFirestore,doc,getDoc,collection,getDocs}]=await Promise.all([import('https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js'),import('https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js')]);const db=getFirestore(initializeApp(firebaseConfig));return Promise.all([getDoc(doc(db,'publicSite','config')),getDocs(collection(db,'publicSite','products','items')),getDocs(collection(db,'publicSite','gallery','items'))])}

@@ -30,8 +30,8 @@ const server=http.createServer((req,res)=>{let pathname=decodeURIComponent(new U
   }
  }
  await page.goto(base+'/');await page.waitForFunction(()=>document.getElementById('site-message')?.textContent==='');
- await page.setViewportSize({width:412,height:900});await page.locator('img[loading=lazy]').evaluateAll(imgs=>imgs.forEach(img=>img.loading='eager'));await page.evaluate(async()=>{await Promise.all([...document.images].map(i=>i.decode()));await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))});await page.screenshot({path:path.join(root,'../../seo-home-mobile.png'),fullPage:true});
- await page.setViewportSize({width:1366,height:900});await page.screenshot({path:path.join(root,'../../seo-home-desktop.png'),fullPage:true});
+ await page.setViewportSize({width:412,height:900});await page.locator('img[loading=lazy]').evaluateAll(imgs=>imgs.forEach(img=>img.loading='eager'));await page.evaluate(async()=>{await Promise.all([...document.images].map(i=>i.decode()));await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))});await page.screenshot({path:path.join(root,'tests/public/seo-home-mobile.png'),fullPage:true});
+ await page.setViewportSize({width:1366,height:900});await page.screenshot({path:path.join(root,'tests/public/seo-home-desktop.png'),fullPage:true});
  await page.locator('.nav a[data-section="produk"]').click();assert(new URL(page.url()).hash==='#produk');
  await page.locator('[data-gallery]').first().click();assert.equal(await page.locator('[role=dialog]').count(),1);await page.locator('[data-next]').click();await page.keyboard.press('Escape');assert.equal(await page.locator('[role=dialog]').count(),0);
  await page.locator('[data-gallery]').first().click();await page.locator('.lightbox').click({position:{x:3,y:3}});assert.equal(await page.locator('[role=dialog]').count(),0);
@@ -39,14 +39,18 @@ const server=http.createServer((req,res)=>{let pathname=decodeURIComponent(new U
  await page.evaluate(()=>navigator.clipboard.writeText=async value=>{window.__shared=value});await page.locator('[data-share]').first().click();assert((await page.evaluate(()=>window.__shared)).endsWith('/produk/horn/'));
  await page.locator('.product-detail-link').first().click();await page.waitForURL('**/produk/horn/');
  await page.evaluate(async()=>{const {mountWebsitePublic}=await import('/manajemen/website-public.js');await mountWebsitePublic({container:document.getElementById('public-root'),db:{},uid:'test',notify:()=>{}})});
+ await page.locator('[data-field="Penjelasan cara pesan"]').fill('Kirim jumlah dan alamat tujuan untuk konfirmasi pesanan.');
+ await page.locator('[data-field="FAQ 1 jawaban"]').fill('Jawaban FAQ hasil edit admin.');
+ await page.locator('#pub-landing button[type=submit]').click();
+ assert.equal((await page.evaluate(()=>window.__saved)).data.faqs[0].answer,'Jawaban FAQ hasil edit admin.');
  await page.locator('[data-tab="seo"]').click();await page.locator('[data-field="beranda title"]').fill('Judul hasil edit admin');await page.locator('[data-field="beranda description"]').fill('Deskripsi hasil edit admin');await page.locator('#pub-seo button[type=submit]').click();
  const saved=await page.evaluate(()=>window.__saved);assert.equal(saved.data.seo.beranda.title,'Judul hasil edit admin');assert.equal(saved.p,'publicSite/config');snapshot.config=saved.data;
  await context.addInitScript(config=>{globalThis.__cmsConfig=config},snapshot.config);
- await page.goto(base+'/');await page.waitForFunction(()=>document.title==='Judul hasil edit admin');assert.equal(await page.locator('meta[property="og:title"]').getAttribute('content'),'Judul hasil edit admin');
+ await page.goto(base+'/');await page.waitForFunction(()=>document.title==='Judul hasil edit admin');assert.equal(await page.locator('meta[property="og:title"]').getAttribute('content'),'Judul hasil edit admin');assert((await page.locator('.buying-guide').innerText()).includes('Kirim jumlah dan alamat tujuan'));await page.locator('.buying-guide summary').first().click();assert((await page.locator('.buying-guide').innerText()).includes('Jawaban FAQ hasil edit admin.'));
  mode='empty';await page.goto(base+'/produk/horn/');await page.waitForFunction(()=>document.title.includes('tidak ditemukan'));assert.equal(await page.locator('meta[name=robots]').getAttribute('content'),'noindex,follow');
  mode='offline';await page.goto(base+'/produk/');await page.waitForFunction(()=>document.getElementById('site-message')?.textContent.includes('belum dapat dimuat'));assert(!(await page.locator('.prices').innerText().catch(()=>'' )).includes('Rp'));
  assert.deepEqual(errors,[]);
  const nojs=await browser.newContext({javaScriptEnabled:false});const staticPage=await nojs.newPage();await staticPage.goto(base+'/produk/horn/');assert.equal(await staticPage.locator('h1').count(),1);assert(!(await staticPage.locator('.prices').innerText()).includes('Rp'));assert((await staticPage.locator('meta[property="og:image"]').getAttribute('content')).includes('/assets/'));
- await staticPage.screenshot({path:path.join(root,'../../seo-static-mobile.png'),fullPage:true});
+ await staticPage.screenshot({path:path.join(root,'tests/public/seo-static-mobile.png'),fullPage:true});
  await browser.close();server.close();console.log('PASS: 28 page/viewport checks; navigation; gallery next/Escape/outside close; WA URL; share copy; product link; CMS save to mocked Firebase and updated SEO/OG; missing/empty/offline; no-JS content; no page errors. No production writes.');
 })().catch(e=>{console.error(e);server.close();process.exit(1)});

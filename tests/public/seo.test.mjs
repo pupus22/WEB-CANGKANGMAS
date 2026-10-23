@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {test} from 'node:test';
 import {pageSeo,seoHead,jsonForHtml} from '../../public-seo.mjs';
-import {defaults,defaultProducts} from '../../site-data.js';
+import {defaults,defaultProducts,improvePublicCopy,waLink} from '../../site-data.js';
 const config={...defaults,address:'Surabaya Selatan',contacts:[{primary:true,active:true,number:'085731929628'}]};
 const products=defaultProducts.map(p=>({...p,retail:24000,image:'/assets/images/'+p.id+'.png'}));
 const make=extra=>pageSeo({config,products,page:'detail',productId:'horn',imageSource:v=>v,...extra});
@@ -29,4 +29,16 @@ test('metadata escapes CMS text and JSON script terminators',()=>{
  const attack='</script><script>alert(1)</script>';
  const meta=make({products:[{...products[0],seoTitle:attack,description:attack}]});
  assert(!jsonForHtml(meta.schema).includes('</script>'));assert(seoHead(meta).includes('&lt;/script&gt;'));
+});
+
+test('marketing updates preserve custom admin copy and normalize WA numbers',()=>{
+ const custom=improvePublicCopy({...defaults,heroText:'Tulisan pilihan pemilik',buttons:{products:'Cek Katalog'}});
+ assert.equal(custom.heroText,'Tulisan pilihan pemilik');assert.equal(custom.buttons.products,'Cek Katalog');
+ assert(waLink('085731929628','Pesan').startsWith('https://wa.me/6285731929628?'));
+ assert.equal(improvePublicCopy({...defaults,contacts:[{name:'WhatsApp Alternatif 1',primary:true}]}).contacts[0].name,'WhatsApp Utama');
+});
+test('catalog exposes visible products and semantic page identity',()=>{
+ const meta=make({page:'produk',products:[products[0],{...products[1],visible:false}]});
+ assert.equal(meta.schema['@graph'].find(x=>x['@type']==='ItemList').itemListElement.length,1);
+ assert(meta.schema['@graph'].some(x=>x['@type']==='CollectionPage'));
 });

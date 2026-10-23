@@ -3,7 +3,7 @@ import path from 'node:path';
 import vm from 'node:vm';
 import {fileURLToPath} from 'node:url';
 import {spawnSync} from 'node:child_process';
-import {defaults} from '../site-data.js';
+import {defaults,improvePublicCopy,improveProductCopy} from '../site-data.js';
 import {firebaseConfig} from '../firebase-config.js';
 import {pageSeo,seoHead,escapeHtml,jsonForHtml} from '../public-seo.mjs';
 
@@ -44,9 +44,9 @@ else {
   data = {config:fields(config.fields || {}),products,gallery};
 }
 if (!data.config || !Array.isArray(data.products) || !Array.isArray(data.gallery)) throw Error('Invalid public data.');
-const config = {...structuredClone(defaults),...data.config,seo:{...defaults.seo,...data.config.seo},buttons:{...defaults.buttons,...data.config.buttons}};
+const config = improvePublicCopy({...structuredClone(defaults),...data.config,seo:{...defaults.seo,...data.config.seo},buttons:{...defaults.buttons,...data.config.buttons}});
 // Price and stock snapshots must not become a second source of truth.
-const products = data.products.filter(p=>p.visible!==false).map(p=>({...p,retail:null,wholesale:null,status:''}));
+const products = data.products.filter(p=>p.visible!==false).map(p=>improveProductCopy({...p,retail:null,wholesale:null,status:''}));
 const gallery = data.gallery.filter(g=>g.visible!==false);
 await fs.rm(out, {recursive:true,force:true});
 const excluded = new Set(['_site','node_modules','.git','scripts','tests','.github']);
@@ -102,3 +102,20 @@ for (const [route,page,id=''] of routes) {
 await fs.writeFile(path.join(out,'sitemap.xml'),`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemap.map(url=>`  <url><loc>${escapeHtml(url)}</loc></url>`).join('\n')}\n</urlset>\n`);
 await fs.writeFile(path.join(out,'seo-build.json'),JSON.stringify({builtAt:new Date().toISOString(),pages:routes.length,source:snapshotArg===-1?'public-firestore':'explicit-snapshot',staticPrices:false},null,2));
 console.log(`Built ${routes.length} public pages in ${out}. Static prices omitted. Source: ${snapshotArg===-1?'live public Firestore':'explicit snapshot'}.`);
+
+const clean=value=>String(value||'').replace(/[\r\n]+/g,' ').trim();
+const links=routes.filter(([route,page])=>config.seo?.[page==='detail'?'produk':page]?.index!==false).filter(([route,page,id])=>page!=='detail'||products.some(p=>p.id===id));
+await fs.writeFile(path.join(out,'llms.txt'),`# ${clean(config.name)}
+
+> ${clean(config.profileText)}
+
+## Informasi usaha
+- Lokasi: ${clean(config.address||config.region)}
+- Wilayah layanan: ${clean(config.region)}
+${config.hours?'- Jam operasional: '+clean(config.hours)+'\n':''}
+## Halaman publik
+${links.map(([route,page,id])=>'- ['+clean(id?products.find(p=>p.id===id).name:({beranda:'Beranda',produk:'Produk dan harga',galeri:'Galeri',profil:'Profil',kontak:'Kontak'}[page]))+']('+new URL(route,base).href+')').join('\n')}
+
+## Harga dan pemesanan
+Harga dan ketersediaan dapat berubah. Gunakan halaman produk dan konfirmasi melalui kontak resmi. ${clean(config.orderText)}
+`);

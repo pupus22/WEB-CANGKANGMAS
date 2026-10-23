@@ -1,0 +1,19 @@
+# Cangkang Mas
+
+> Cangkang Mas merupakan agen telur di Surabaya yang melayani kebutuhan rumah tangga, toko, dan usaha kuliner.
+
+## Informasi usaha
+- Lokasi: Surabaya Selatan
+- Wilayah layanan: Surabaya Selatan dan sekitarnya
+
+## Halaman publik
+- [Beranda](https://cangkangmas.id/)
+- [Produk dan harga](https://cangkangmas.id/produk/)
+- [Galeri](https://cangkangmas.id/galeri/)
+- [Profil](https://cangkangmas.id/profil/)
+- [Kontak](https://cangkangmas.id/kontak/)
+- [Telur HORN](https://cangkangmas.id/produk/horn/)
+- [Telur OMEGA](https://cangkangmas.id/produk/omega/)
+
+## Harga dan pemesanan
+Harga dan ketersediaan dapat berubah. Gunakan halaman produk dan konfirmasi melalui kontak resmi. Pilih produk, lalu kirim jenis telur, jumlah kebutuhan, dan lokasi pengiriman melalui WhatsApp. Konfirmasikan harga, stok, serta ongkir sebelum menyelesaikan pesanan.

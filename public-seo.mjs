@@ -29,6 +29,9 @@ export function pageSeo({config, products = [], page, productId = '', base = 'ht
   // Only publish openingHours when the saved text already uses Schema.org's format.
   if (/^(Mo|Tu|We|Th|Fr|Sa|Su)(?:-(?:Mo|Tu|We|Th|Fr|Sa|Su))? \d{2}:\d{2}-\d{2}:\d{2}$/.test(text(cfg.hours))) business.openingHours = text(cfg.hours);
   const graph = [business, {'@type':'WebSite','@id':new URL('#website', base).href,url:base,name,inLanguage:'id-ID'}];
+  graph.push({'@type':page==='kontak'?'ContactPage':page==='profil'?'AboutPage':page==='produk'?'CollectionPage':'WebPage','@id':url+'#halaman',url,name:title,description,inLanguage:'id-ID',isPartOf:{'@id':new URL('#website',base).href},about:{'@id':business['@id']}});
+  if(page==='produk')graph.push({'@type':'ItemList',itemListElement:products.filter(x=>x.visible!==false).map((x,i)=>({'@type':'ListItem',position:i+1,name:text(x.name),url:new URL(productPath(x.id),base).href}))});
+  if(page!=='beranda'&&page!=='detail')graph.push({'@type':'BreadcrumbList',itemListElement:[{'@type':'ListItem',position:1,name:'Beranda',item:base},{'@type':'ListItem',position:2,name:({produk:'Produk',galeri:'Galeri',profil:'Profil',kontak:'Kontak'}[page]||title),item:url}]});
   if (p && !missing) {
     const product = {'@type':'Product','@id':url+'#produk',name:text(p.name),description:text(p.description),url,brand:{'@type':'Brand',name}};
     if (image) product.image = [image];
