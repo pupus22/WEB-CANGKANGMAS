@@ -38,4 +38,4 @@ html{scroll-behavior:smooth;--header-height:136px}.header{position:sticky;top:0;
  .grid .product-detail-link{font-size:.74rem;line-height:1.4;min-height:44px;margin-top:6px}
 }
 
-.buying-guide{max-width:1000px}.buying-guide>p,.product-help p{line-height:1.75;max-width:75ch}.buying-guide details{border-bottom:1px solid #cbd5e1;padding:16px 0}.buying-guide summary{cursor:pointer;font-weight:600;min-height:28px}.buying-guide summary:focus-visible{outline:3px solid #2265aa;outline-offset:4px}.buying-guide details p{line-height:1.7}.product-help{margin:28px 0}.buying-guide h2{margin-top:28px}
+.buying-guide{max-width:none;padding-top:32px}.section.wrap>.buying-guide{width:100%;margin-inline:0}.buying-guide>h2:first-child{margin-top:0}.buying-guide>p,.product-help p{line-height:1.75;max-width:75ch}.buying-guide details{border-bottom:1px solid #cbd5e1;padding:16px 0}.buying-guide summary{cursor:pointer;font-weight:600;min-height:28px}.buying-guide summary:focus-visible{outline:3px solid #2265aa;outline-offset:4px}.buying-guide details p{line-height:1.7}.product-help{margin:28px 0}.buying-guide h2{margin-top:28px}
