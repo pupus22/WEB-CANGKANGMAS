@@ -1,19 +1,25 @@
 # Cangkang Mas
 
-> Cangkang Mas merupakan agen telur di Surabaya yang melayani kebutuhan rumah tangga, toko, dan usaha kuliner.
+> Cangkang Mas adalah agen dan distributor telur ayam negeri (Horn) serta telur Omega segar di Surabaya Selatan yang melayani pembelian eceran rumah tangga dan pasokan grosir rutin untuk warung, toko sembako, katering, dan usaha kuliner.
 
-## Informasi usaha
-- Lokasi: Surabaya Selatan
-- Wilayah layanan: Surabaya Selatan dan sekitarnya
+## Informasi Usaha & Operasional
+- Lokasi Utama: Surabaya Selatan, Jawa Timur
+- Wilayah Layanan: Surabaya Selatan dan sekitarnya (Wonokromo, Gayungan, Jambangan, Wiyung, Ketintang, dll.)
+- Jam Operasional: Senin – Sabtu, 07.00 – 17.00 WIB
+- Kontak Resmi / WhatsApp: [Masukkan Link WhatsApp Anda di sini, cth: https://wa.me/628xxxxxxxxxx]
 
-## Halaman publik
+## Katalog Produk & Spesifikasi
+- **Telur HORN (Ayam Negeri)**: Segar harian dari kandang, cangkang tebal dan bersih, sudah disortir bebas retak. Estimasi isi ±15–17 butir per kg. Tersedia eceran (mulai 1 kg) dan grosir (minimum grosir: 10 kg / per ikat).
+- **Telur OMEGA**: Kuning telur oranye pekat, tinggi kandungan Omega-3, tidak berbau amis, kualitas premium untuk kesehatan keluarga dan MPASI. Estimasi isi ±15–16 butir per kg.
+
+## Halaman Publik
 - [Beranda](https://cangkangmas.id/)
-- [Produk dan harga](https://cangkangmas.id/produk/)
-- [Galeri](https://cangkangmas.id/galeri/)
-- [Profil](https://cangkangmas.id/profil/)
-- [Kontak](https://cangkangmas.id/kontak/)
+- [Produk dan Harga](https://cangkangmas.id/produk/)
+- [Galeri Usaha](https://cangkangmas.id/galeri/)
+- [Profil Usaha](https://cangkangmas.id/profil/)
+- [Kontak & Lokasi](https://cangkangmas.id/kontak/)
 - [Telur HORN](https://cangkangmas.id/produk/horn/)
 - [Telur OMEGA](https://cangkangmas.id/produk/omega/)
 
-## Harga dan pemesanan
-Harga dan ketersediaan dapat berubah. Gunakan halaman produk dan konfirmasi melalui kontak resmi. Pilih produk, lalu kirim jenis telur, jumlah kebutuhan, dan lokasi pengiriman melalui WhatsApp. Konfirmasikan harga, stok, serta ongkir sebelum menyelesaikan pesanan.
+## Kebijakan Harga dan Pemesanan
+Harga mengikuti fluktuasi pasar harian. Pembeli dapat mengecek kisaran harga terbaru di halaman produk dan wajib melakukan konfirmasi real-time melalui WhatsApp resmi sebelum menyelesaikan pesanan untuk memastikan ketersediaan stok dan estimasi ongkos kirim.
