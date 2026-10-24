@@ -1,5 +1,6 @@
 {
   "source": "pupus22/WEB-CANGKANGMAS main archive retrieved 2026-10-24",
+  "revision": "spacing correction after second screenshot",
   "changedExistingFiles": [
     "galeri/index.html",
     "index.html",
@@ -15,8 +16,8 @@
   ],
   "protectedFilesUnchanged": 25,
   "checks": {
-    "layoutViewportCombinations": 49,
-    "engineTests": 38,
+    "layoutViewportCombinationsAfterSpacing": 49,
+    "engineTestsPreviouslyPassedAndEngineUnchanged": 38,
     "seoTests": 6
   },
   "sourceArchiveSha256": "368cbde3beea10cdb687c06fb395e85e9cbb7f420ad89dbe50bccb9959725240"

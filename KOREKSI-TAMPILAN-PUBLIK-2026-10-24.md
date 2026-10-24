@@ -1,5 +1,11 @@
 # Koreksi tampilan publik, 24 Oktober 2026
 
+## Koreksi lanjutan jarak, setelah screenshot kedua
+
+ZIP ini sudah mencakup koreksi spasi lanjutan. Margin antarparagraf informasi pemesanan dikurangi dari 20 menjadi 10 px; jarak bawah judul dari 18 menjadi 12 px. Tinggi baris 1,6 di HP dan 1,65 di layar lebih lebar mempertahankan keterbacaan. Jarak judul FAQ, tombol pemesanan, profil, layanan, dan kontak dirapikan. Padding bagian umum berubah dari 40/54/72 px menjadi skala responsif 28 hingga 48 px. Panduan di dalam halaman tidak lagi menambahkan padding bawah satu bagian penuh di atas padding halaman induk.
+
+PASS R-03/R-35: setelah perubahan spasi ini, tujuh halaman kembali diperiksa pada tujuh lebar 320 sampai 1440 px, total 49 kombinasi. Tidak ada overflow, harga dan detail kedua kartu tetap sejajar, semua kontrol yang diperiksa tetap sekurangnya 44 px, dan ketiga paragraf Pemesanan di HORN/OMEGA memiliki margin bawah 10 px pada setiap lebar. Perubahan lanjutan ini hanya CSS; teks, tautan, dan perilaku interaksi tidak diubah.
+
 ## Sumber dan cakupan
 
 Paket ini menggunakan salinan repository `pupus22/WEB-CANGKANGMAS` yang diambil pada sesi ini. public.js dan public.css sebelum perubahan cocok byte demi byte dengan website tayang. Repository ini lebih baru daripada ZIP 22 Oktober: sudah berisi pembaruan teks, panduan pemesanan, FAQ, llms.txt, dan perubahan panel publik. Pembaruan tersebut dipertahankan.

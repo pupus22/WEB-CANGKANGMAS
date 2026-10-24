@@ -38,7 +38,7 @@ html{scroll-behavior:smooth;--header-height:136px}.header{position:sticky;top:0;
  .grid .product-detail-link{font-size:.74rem;line-height:1.4;min-height:44px;margin-top:6px}
 }
 
-.buying-guide{padding-top:32px}.section.wrap>.buying-guide,.detail>.buying-guide{width:100%;margin-inline:0}.buying-guide>h2:first-child{margin-top:0}.buying-guide>p,.product-help p{line-height:1.75;max-width:75ch}.buying-guide details{border-bottom:1px solid #cbd5e1;padding:8px 0}.buying-guide summary{cursor:pointer;font-weight:600;min-height:44px;padding-block:10px}.buying-guide summary:focus-visible{outline:3px solid #2265aa;outline-offset:4px}.buying-guide details p{line-height:1.7;margin:8px 0 16px}.product-help{margin:28px 0}.buying-guide h2{margin-top:28px}
+.buying-guide{padding-block:28px 36px}.section.wrap>.buying-guide,.detail>.buying-guide{width:100%;margin-inline:0;padding-block:28px 0}.buying-guide>h2:first-child{margin-top:0}.buying-guide>p,.product-help p{line-height:1.65;max-width:75ch;margin-bottom:10px}.buying-guide details{border-bottom:1px solid #cbd5e1;padding:4px 0}.buying-guide summary{cursor:pointer;font-weight:600;min-height:44px;padding-block:10px}.buying-guide summary:focus-visible{outline:3px solid #2265aa;outline-offset:4px}.buying-guide details p{line-height:1.65;margin:4px 0 12px}.product-help{margin:24px 0 16px}.product-help h2{margin-bottom:12px}.product-help>a{margin-top:0}.buying-guide h2{margin-top:24px;margin-bottom:12px}
 
 /* Product cards share a bottom edge so descriptions can grow without moving the actions. */
 .grid>.card{display:flex;flex-direction:column}
@@ -64,7 +64,7 @@ html{scroll-behavior:smooth;--header-height:136px}.header{position:sticky;top:0;
 .detail .card-actions{display:grid;grid-template-columns:minmax(0,1fr);gap:10px}
 .detail .price strong{font-size:clamp(1.2rem,2.2vw,1.9rem)}
 .product-help>a{display:inline-flex;align-items:center;min-height:44px}
-.order-actions{align-items:stretch;margin-block:24px 32px}
+.order-actions{align-items:stretch;margin-block:16px 24px}
 .order-actions>.btn{min-height:48px}
 .related-products{gap:12px}
 @media(max-width:599px){
@@ -86,4 +86,22 @@ html{scroll-behavior:smooth;--header-height:136px}.header{position:sticky;top:0;
  .detail .card{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}
  .detail .card>.photo{height:auto;aspect-ratio:1}
  .detail .card-body{padding:28px}
+}
+
+/* Section spacing follows the content scale; nested guides do not add a second section's padding. */
+.section:not(.buying-guide){padding-block:clamp(28px,4vw,48px)}
+.services-section.section{padding-top:8px}
+.intro{margin-bottom:24px}
+.intro>p:last-child,.section-heading>p:last-child{margin-bottom:0}
+.profile-layout p{line-height:1.65;margin-bottom:14px}
+.profile-layout h1,.profile-layout h2{margin-bottom:14px}
+.profile-layout .notice{margin-bottom:16px}
+.service h3{margin-bottom:8px}
+.contact-main p{margin-bottom:16px}
+.location-head p{margin-bottom:18px}
+@media(max-width:599px){
+ .product-help{margin-block:20px 12px}
+ .product-help p,.buying-guide>p{line-height:1.6}
+ .section.wrap>.buying-guide,.detail>.buying-guide{padding-top:24px}
+ .order-actions{margin-block:14px 20px}
 }
